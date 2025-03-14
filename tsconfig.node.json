@@ -1,4 +1,5 @@
 {
+  // node.js 옵션
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
     "incremental": true,
@@ -6,6 +7,8 @@
     "lib": ["ES2023"],
     "module": "ESNext",
     "skipLibCheck": true,
+
+    "types": ["navermaps"],
 
     /* Bundler mode */
     "moduleResolution": "bundler",
