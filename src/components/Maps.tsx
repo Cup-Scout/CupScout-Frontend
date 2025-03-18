@@ -1,10 +1,11 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const Maps = () => {
   const mapRef = useRef<HTMLDivElement | null>(null);
+  const [map, setMapInstance] = useState<any>(null); // map 상태 추가
 
   //! 임시 position
-  const position = [
+  const cafePosition = [
     { lat: 37.5213006, lng: 126.9288968 },
     { lat: 37.4836332, lng: 126.9394218 },
     { lat: 37.4837762, lng: 126.928656 },
@@ -18,7 +19,7 @@ const Maps = () => {
     try {
       const map = new naver.maps.Map(mapRef.current, {
         center: location,
-        zoom: 10,
+        zoom: 11,
         zoomControl: true,
         zoomControlOptions: {
           style: naver.maps.ZoomControlStyle.SMALL,
@@ -32,28 +33,25 @@ const Maps = () => {
     }
   };
 
-  const getSuccess = (position: any) => {
+  const initialMaps = () => {
+    const { naver } = window;
+    if (!naver) throw new Error('네이버 지도 API를 찾을 수 없습니다.');
+    if (mapRef.current) {
+      const location = new naver.maps.LatLng(37.5666103, 126.9783882);
+      const newMap = setMap(naver, location);
+      setMapInstance(newMap); // map 상태 업데이트
+    }
+  };
+
+  const getSuccess = (position: { lat: number; lng: number }[], map: any) => {
     try {
-      if (!Array.isArray(position) || position.length === 0) {
-        throw new Error('위치 데이터가 유효하지 않습니다.');
-      }
-      const lat = position[0].lat;
-      const lng = position[0].lng;
       const { naver } = window;
-
       if (!naver) throw new Error('네이버 지도 API를 찾을 수 없습니다.');
-
-      let map;
-      if (mapRef.current && naver) {
-        const location = new naver.maps.LatLng(lat, lng);
-        map = setMap(naver, location);
-        setMarker(map, location);
-      }
-
-      //* position[1] 부터 마커 생성하기
       if (map) {
-        //* 배열 0번은 이미 center로 설정 => 1번부터 시작
-        for (let i = 1; i < position.length; i++) {
+        if (!Array.isArray(position) || position.length === 0) {
+          throw new Error('위치 데이터가 유효하지 않습니다.');
+        }
+        for (let i = 0; i < position.length; i++) {
           try {
             const latitude = position[i].lat;
             const longitude = position[i].lng;
@@ -81,9 +79,14 @@ const Maps = () => {
   };
 
   useEffect(() => {
-    // navigator.geolocation.getCurrentPosition(getSuccess, getError);
-    getSuccess(position);
+    initialMaps();
   }, []);
+
+  useEffect(() => {
+    if (map) {
+      getSuccess(cafePosition, map);
+    }
+  }, [map]); // map이 생성된 후 getSuccess 실행
 
   return (
     <div id="map" ref={mapRef} style={{ width: '100%', height: '400px' }}>
