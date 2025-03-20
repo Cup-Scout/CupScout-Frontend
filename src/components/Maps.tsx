@@ -4,10 +4,10 @@ interface cafeInfo {
   id: number;
   name: string;
   address_doro: string;
-  lat: number;
-  lng: number;
-  description: string;
-  categories: string;
+  lat: number | null;
+  lng: number | null;
+  description: string | null;
+  categories: string | null;
   visible: number;
   deleted: number;
   created: string;
@@ -16,23 +16,6 @@ interface cafeInfo {
 
 const Maps = () => {
   const mapRef = useRef<HTMLDivElement | null>(null);
-
-  //! 임시 position
-  const cafePosition = [
-    {
-      id: 1,
-      name: '카페꼼마 여의도점',
-      address_doro: '서울 영등포구 국제금융로8길 16 1층 카페꼼마',
-      lat: 37.5213006,
-      lng: 126.9288968,
-      description: '문학동네에서 운영하는 대형 북카페',
-      categories: '1,2',
-      visible: 1,
-      deleted: 0,
-      created: '2025-02-14T06:24:38.000Z',
-      updated: '2025-03-10T21:21:32.000Z',
-    },
-  ];
 
   const setMap = (naver: any, location: any) => {
     try {
@@ -52,7 +35,7 @@ const Maps = () => {
     }
   };
 
-  const getSuccess = async (cafe: cafeInfo[]) => {
+  const getSuccess = async () => {
     try {
       const { naver } = window;
       if (!naver) throw new Error('네이버 지도 API를 찾을 수 없습니다.');
@@ -61,10 +44,10 @@ const Maps = () => {
         const location = new naver.maps.LatLng(37.5666103, 126.9783882);
         map = setMap(naver, location);
       }
-      if (map) {
+      const cafeList = await getCafe();
+      if (map && cafeList.length) {
         //: 주소를 좌표로 변환하여 요소 추가해서 배열로 만들기
-        const newCafe = await convertAddress(cafe);
-        console.log(newCafe);
+        const newCafe = await convertAddress(cafeList);
         if (!Array.isArray(newCafe) || newCafe.length === 0) {
           throw new Error('위치 데이터가 유효하지 않습니다.');
         }
@@ -95,8 +78,16 @@ const Maps = () => {
     }
   };
 
+  const getCafe = async () => {
+    const response = await fetch(
+      `${import.meta.env.VITE_APP_LOCAL_API_URL}/api/cafes`,
+    );
+    const cafeList = response.json();
+    return cafeList;
+  };
+
   useEffect(() => {
-    getSuccess(cafePosition);
+    getSuccess();
   }, []);
 
   const convertAddress = async (cafe: cafeInfo[]) => {
