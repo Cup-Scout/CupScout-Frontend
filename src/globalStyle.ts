@@ -35,7 +35,8 @@ const GlobalStyles = createGlobalStyle`
     .wrapper {
       max-width:440px;
       margin:0 auto;
-      background-color:red;
+      padding: 2.7rem;
+      border:1px solid #ccc
     }
 `;
 
