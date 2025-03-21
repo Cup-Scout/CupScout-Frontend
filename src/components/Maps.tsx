@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import styled from 'styled-components';
 
 interface cafeInfo {
   id: number;
@@ -120,10 +121,16 @@ const Maps = () => {
   };
 
   return (
-    <div id="map" ref={mapRef} style={{ width: '100%', height: '400px' }}>
-      Maps
-    </div>
+    <section>
+      <MapBox id="map" ref={mapRef} style={{ width: '100%', height: '400px' }}>
+        Maps
+      </MapBox>
+    </section>
   );
 };
+
+const MapBox = styled.div`
+  border-radius: 12px;
+`;
 
 export default Maps;
