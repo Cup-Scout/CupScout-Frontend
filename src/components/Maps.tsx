@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 
 interface cafeInfo {
@@ -14,9 +14,17 @@ interface cafeInfo {
   created: string;
   updated: string;
 }
+interface markerInfo {
+  id: number;
+  addressDoro: string;
+  cafeName: string;
+}
 
 const Maps = () => {
   const mapRef = useRef<HTMLDivElement | null>(null);
+  const [clickMarkerInfo, setClickMarkerInfo] = useState<markerInfo | null>(
+    null,
+  );
 
   const setMap = (naver: any, location: any) => {
     try {
@@ -40,7 +48,7 @@ const Maps = () => {
     try {
       const { naver } = window;
       if (!naver) throw new Error('네이버 지도 API를 찾을 수 없습니다.');
-      let map;
+      let map: any;
       if (mapRef.current) {
         const location = new naver.maps.LatLng(37.5666103, 126.9783882);
         map = setMap(naver, location);
@@ -56,8 +64,54 @@ const Maps = () => {
           try {
             const latitude = newCafe[i].lat;
             const longitude = newCafe[i].lng;
+            const addressDoro = newCafe[i].address_doro;
+            const id = newCafe[i].id;
+            const cafeName = newCafe[i].name;
             const location = new naver.maps.LatLng(latitude, longitude);
-            setMarker(map, location);
+            const { markers }: any = setMarker(map, location);
+            naver.maps.Event.addListener(map, 'idle', function () {
+              updateMarkers(map, markers);
+            });
+            const updateMarkers = (map: any, markers: any) => {
+              var mapBounds = map.getBounds();
+              var marker, position;
+
+              for (var i = 0; i < markers.length; i++) {
+                marker = markers[i];
+                position = marker.getPosition();
+
+                if (mapBounds.hasLatLng(position)) {
+                  showMarker(map, marker);
+                } else {
+                  hideMarker(map, marker);
+                }
+              }
+            };
+
+            const showMarker = (map: any, marker: any) => {
+              if (marker.setMap()) return;
+              marker.setMap(map);
+            };
+
+            const hideMarker = (map: any, marker: any) => {
+              if (!marker.setMap()) return;
+              marker.setMap(null);
+            };
+
+            // 해당 마커의 인덱스를 seq라는 클로저 변수로 저장하는 이벤트 핸들러를 반환합니다.
+            const getClickHandler = (seq: any) => {
+              return function (e: any) {
+                setClickMarkerInfo({ id, cafeName, addressDoro });
+              };
+            };
+
+            for (var j = 0, jj = markers.length; j < jj; j++) {
+              naver.maps.Event.addListener(
+                markers[j],
+                'click',
+                getClickHandler(j),
+              );
+            }
           } catch (error) {
             console.error(`마커 생성 오류 (index: ${i}):`, error);
           }
@@ -69,11 +123,15 @@ const Maps = () => {
   };
 
   const setMarker = (map: any, location: any) => {
+    let markers = [];
     try {
-      new naver.maps.Marker({
+      const marker = new naver.maps.Marker({
         position: location,
         map,
       });
+
+      markers.push(marker);
+      return { markers };
     } catch (error) {
       console.error('마커 추가 중 오류 발생:', error);
     }
@@ -121,16 +179,53 @@ const Maps = () => {
   };
 
   return (
-    <section>
-      <MapBox id="map" ref={mapRef} style={{ width: '100%', height: '400px' }}>
+    <Section>
+      <MapBox id="map" ref={mapRef} style={{ width: '100%', height: '300px' }}>
         Maps
       </MapBox>
-    </section>
+      {clickMarkerInfo && (
+        <AddressWrapper>
+          <p>{clickMarkerInfo.cafeName}</p>
+          <p>
+            <span>도로명</span>
+            {clickMarkerInfo.addressDoro}
+          </p>
+        </AddressWrapper>
+      )}
+    </Section>
   );
 };
+const Section = styled.section`
+  position: relative;
+`;
 
 const MapBox = styled.div`
   border-radius: 12px;
+`;
+const AddressWrapper = styled.div`
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  z-index: 100;
+  background-color: #fff;
+  padding: 8px;
+  border: 1px solid #9e9e9e;
+  border-radius: 12px;
+  p:first-child {
+    font-size: 12px;
+    margin-bottom: 4px;
+  }
+  p:last-child {
+    font-size: 10px;
+    span {
+      display: inline-block;
+      background-color: #d9d9d9;
+      color: #363636;
+      padding: 3px 5px;
+      border-radius: 12px;
+      margin-right: 4px;
+    }
+  }
 `;
 
 export default Maps;
