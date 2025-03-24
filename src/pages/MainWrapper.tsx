@@ -1,5 +1,4 @@
 import styled from 'styled-components';
-import sampleCafeImg from '../assets/sampleCafe.png';
 
 const MainWrapper = () => {
   return (
@@ -8,7 +7,7 @@ const MainWrapper = () => {
         <ul>
           <li>
             <p>
-              <span>📝</span>공부하기 좋은 카페
+              <span>☕️</span>모든 카페
             </p>
           </li>
           <li>
