@@ -1,30 +1,54 @@
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+
+interface categoryInfo {
+  category: string;
+  created: string;
+  description: string;
+  id: number;
+  updated: string;
+}
 
 const MainWrapper = () => {
+  const navigate = useNavigate();
+  const [categoryListArr, setCategoryListArr] = useState<categoryInfo[]>([]);
+
+  const getCategory = async () => {
+    const response = await fetch(
+      `${import.meta.env.VITE_APP_LOCAL_API_URL}/api/categories`,
+    );
+    const categoryList = await response.json();
+    setCategoryListArr(categoryList);
+  };
+
+  useEffect(() => {
+    getCategory();
+  }, []);
+
   return (
     <Main className="wrapper">
       <Nav>
         <ul>
-          <li>
+          <li onClick={() => navigate('/cafe', { state: 999 })}>
             <p>
               <span>☕️</span>모든 카페
             </p>
           </li>
-          <li>
-            <p>
-              <span>📚</span>북카페
-            </p>
-          </li>
-          <li>
-            <p>
-              <span>🍧</span>빙수 맛집
-            </p>
-          </li>
-          <li>
-            <p>
-              <span>🎡</span>추억의 장소
-            </p>
-          </li>
+          {categoryListArr.map(
+            (value, index) =>
+              index < 3 && (
+                <li
+                  key={value.id}
+                  onClick={() => navigate('/cafe', { state: value.id })}
+                >
+                  <p>
+                    <span>☕️</span>
+                    {value.description}
+                  </p>
+                </li>
+              ),
+          )}
         </ul>
       </Nav>
       <Article>
