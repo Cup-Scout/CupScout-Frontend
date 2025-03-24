@@ -20,7 +20,7 @@ interface markerInfo {
   cafeName: string;
 }
 
-const Maps = () => {
+const Maps = ({ cafeListArr }: any) => {
   const mapRef = useRef<HTMLDivElement | null>(null);
   const [clickMarkerInfo, setClickMarkerInfo] = useState<markerInfo | null>(
     null,
@@ -44,7 +44,7 @@ const Maps = () => {
     }
   };
 
-  const getSuccess = async () => {
+  const getSuccess = async (cafeListArr: cafeInfo[] | null) => {
     try {
       const { naver } = window;
       if (!naver) throw new Error('네이버 지도 API를 찾을 수 없습니다.');
@@ -53,7 +53,13 @@ const Maps = () => {
         const location = new naver.maps.LatLng(37.5666103, 126.9783882);
         map = setMap(naver, location);
       }
-      const cafeList = await getCafe();
+      let cafeList;
+      if (cafeListArr === null) {
+        cafeList = await getCafe();
+      } else {
+        cafeList = cafeListArr;
+      }
+      // const cafeList = await getCafe();
       if (map && cafeList.length) {
         //: 주소를 좌표로 변환하여 요소 추가해서 배열로 만들기
         const newCafe = await convertAddress(cafeList);
@@ -146,8 +152,9 @@ const Maps = () => {
   };
 
   useEffect(() => {
-    getSuccess();
-  }, []);
+    //: cafeList가 변할때마다 지도 함수 다시 실행
+    getSuccess(cafeListArr);
+  }, [cafeListArr]);
 
   const convertAddress = async (cafe: cafeInfo[]) => {
     const geocodePromise = (

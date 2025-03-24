@@ -1,3 +1,4 @@
+import { useEffect, useState, Dispatch, SetStateAction } from 'react';
 import styled from 'styled-components';
 
 interface categoryInfo {
@@ -8,17 +9,39 @@ interface categoryInfo {
   updated: string;
 }
 
-interface CategoryProps {
-  categoryListArr: categoryInfo[];
-}
+const Category = ({ selectedCategories, setSelectedCategories }: any) => {
+  const [categoryListArr, setCategoryListArr] = useState<categoryInfo[]>([]);
 
-const Category = ({ categoryListArr }: CategoryProps) => {
+  const getCategory = async () => {
+    const response = await fetch(
+      `${import.meta.env.VITE_APP_LOCAL_API_URL}/api/categories`,
+    );
+    const categoryList = await response.json();
+    setCategoryListArr(categoryList);
+  };
+
+  useEffect(() => {
+    getCategory();
+  }, []);
+
+  const selectCategory = async (id: number) => {
+    const newSelected = new Set(selectedCategories);
+    newSelected.has(id) ? newSelected.delete(id) : newSelected.add(id);
+    setSelectedCategories(newSelected);
+  };
+
   return (
     <CategoryNav>
       <ul>
         {categoryListArr.length !== 0 &&
           categoryListArr.map((value) => (
-            <li key={value.id}>{value.description}</li>
+            <li
+              key={value.id}
+              onClick={() => selectCategory(value.id)}
+              className={selectedCategories.has(value.id) ? 'selected' : ''}
+            >
+              #{value.description}
+            </li>
           ))}
       </ul>
     </CategoryNav>
@@ -44,6 +67,15 @@ const CategoryNav = styled.nav`
       white-space: nowrap;
       margin-right: 6px;
       font-size: 0.9rem;
+      cursor: pointer;
+      &:active {
+        background-color: rgba(0, 0, 0, 0.5);
+        color: #fff;
+      }
+      &.selected {
+        background-color: rgba(0, 0, 0, 0.5);
+        color: #fff;
+      }
     }
   }
 `;
