@@ -1,11 +1,25 @@
+import { useRef } from 'react';
 import styled from 'styled-components';
 import searchIcon from '../assets/search-icon.png';
 
-const Search = () => {
+const Search = ({ setCafeListArr }: any) => {
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
+  const searchCafeName = async () => {
+    if (inputRef.current) {
+      const searchValue = inputRef.current.value;
+      const response = await fetch(
+        `${import.meta.env.VITE_APP_LOCAL_API_URL}/api/cafes?name=${searchValue}`,
+      );
+      const data = await response.json();
+      setCafeListArr(data);
+    }
+  };
+
   return (
     <Section>
-      <Input type="text" placeholder="카페검색" />
-      <StyledButton type="button">
+      <Input type="text" placeholder="카페검색" ref={inputRef} />
+      <StyledButton type="button" onClick={searchCafeName}>
         <Icon src={searchIcon} alt="search" />
       </StyledButton>
     </Section>
