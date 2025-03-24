@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import Maps from '../components/Maps';
 import Search from '../components/Search';
@@ -27,6 +27,7 @@ const CafeWrapper = () => {
     new Set(),
   );
   const location = useLocation();
+  const navigate = useNavigate();
 
   const getAllCafeList = async () => {
     const response = await fetch(
@@ -38,6 +39,7 @@ const CafeWrapper = () => {
   };
 
   const getCafesByCategories = async (categorySet: Set<number>) => {
+    console.log(categorySet);
     const responses = await Promise.all(
       [...categorySet].map((id) =>
         fetch(
@@ -67,6 +69,8 @@ const CafeWrapper = () => {
       //: 만들어진 자료구조를 인자로 넘겨서 해당 카테고리 리스트 불러오기
       getCafesByCategories(newSet);
     }
+
+    navigate(location.pathname, { replace: true });
   }, []);
 
   //* 핵심은 category가 변경되면 cafe list 갱신을 이곳에서 해주는 것.
@@ -83,7 +87,7 @@ const CafeWrapper = () => {
 
   return (
     <Main className="wrapper">
-      <Search />
+      <Search setCafeListArr={setCafeListArr} />
       <Category
         selectedCategories={selectedCategories}
         setSelectedCategories={setSelectedCategories}

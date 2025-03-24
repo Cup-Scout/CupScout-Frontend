@@ -58,6 +58,7 @@ const CategoryNav = styled.nav`
     flex-wrap: nowrap;
     align-items: center;
     box-sizing: border-box;
+    padding-bottom: 5px;
 
     li {
       background-color: #d9d9d9;
