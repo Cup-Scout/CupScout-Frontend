@@ -2,8 +2,8 @@ import { createGlobalStyle } from 'styled-components';
 import reset from 'styled-reset';
 
 /*
-최대 width : 640px 
-선정 이유 : tailwind css에서 sm의 최대 넓이가 640px로 설정되어있음
+최대 width : 440px 
+선정 이유 : Iphone 16 pro max 가준
 */
 
 const GlobalStyles = createGlobalStyle` 
@@ -33,9 +33,10 @@ const GlobalStyles = createGlobalStyle`
     }
 
     .wrapper {
-      max-width:640px;
+      max-width:440px;
       margin:0 auto;
-      background-color:red;
+      padding: 2.7rem;
+      border:1px solid #ccc
     }
 `;
 
