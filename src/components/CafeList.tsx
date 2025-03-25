@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import bottomArrow from '../assets/bottom-arrow.png';
 import sampleCafe from '../assets/sampleCafe.png';
+import LoadingState from './LoadingState';
 
 interface cafeInfo {
   id: number;
@@ -95,14 +96,15 @@ const CafeList = ({ cafeListArr }: cafeListArrProps) => {
   const callback = () => {
     if (loading) return;
     if (cafeList.length >= cafeListArr.length) return; // 여기도 setPage(0) 말고 그냥 return
-
     setLoading(true);
-    const start = page * pageList;
-    const end = start + pageList;
-    const nextList = cafeListArr.slice(start, end);
-    setCafeList((prev) => [...prev, ...nextList]);
-    setPage((prev) => prev + 1);
-    setLoading(false);
+    setTimeout(() => {
+      const start = page * pageList;
+      const end = start + pageList;
+      const nextList = cafeListArr.slice(start, end);
+      setCafeList((prev) => [...prev, ...nextList]);
+      setPage((prev) => prev + 1);
+      setLoading(false);
+    }, 500);
   };
   import.meta.env.VITE_APP_LOCAL_API_URL;
 
@@ -243,6 +245,7 @@ const CafeList = ({ cafeListArr }: cafeListArrProps) => {
         {cafeList.length < cafeListArr.length && (
           <div style={{ height: '10px' }} ref={target}></div>
         )}
+        {loading && <LoadingState />}
       </ul>
     </Section>
   );
