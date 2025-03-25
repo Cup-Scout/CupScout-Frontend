@@ -1,24 +1,36 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import styled from 'styled-components';
 import searchIcon from '../assets/search-icon.png';
 
 const Search = ({ setCafeListArr }: any) => {
-  const inputRef = useRef<HTMLInputElement | null>(null);
+  // const inputRef = useRef<HTMLInputElement | null>(null);
+  const [value, setValue] = useState('');
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    const regex = /^[ㄱ-ㅎ|ㅏ-ㅣ|가-힣a-zA-Z0-9\s]*$/;
+    if (regex.test(inputValue)) {
+      //: 정규식을 통과한 value만 set
+      setValue(inputValue);
+    }
+  };
 
   const searchCafeName = async () => {
-    if (inputRef.current) {
-      const searchValue = inputRef.current.value;
-      const response = await fetch(
-        `${import.meta.env.VITE_APP_LOCAL_API_URL}/api/cafes?name=${searchValue}`,
-      );
-      const data = await response.json();
-      setCafeListArr(data);
-    }
+    const response = await fetch(
+      `${import.meta.env.VITE_APP_LOCAL_API_URL}/api/cafes?name=${value}`,
+    );
+    const data = await response.json();
+    setCafeListArr(data);
   };
 
   return (
     <Section>
-      <Input type="text" placeholder="카페검색" ref={inputRef} />
+      <Input
+        type="text"
+        placeholder="카페검색"
+        value={value}
+        onChange={handleChange}
+      />
       <StyledButton type="button" onClick={searchCafeName}>
         <Icon src={searchIcon} alt="search" />
       </StyledButton>
