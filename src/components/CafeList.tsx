@@ -162,10 +162,7 @@ const CafeList = ({ cafeListArr }: cafeListArrProps) => {
             </CafeListLi>
           ))}
         {cafeList.length < cafeListArr.length && (
-          <div
-            style={{ height: '10px', backgroundColor: 'red' }}
-            ref={target}
-          ></div>
+          <div style={{ height: '10px' }} ref={target}></div>
         )}
       </ul>
     </Section>
