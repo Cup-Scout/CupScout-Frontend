@@ -75,8 +75,6 @@ const CafeList = ({ cafeListArr }: cafeListArrProps) => {
     const start = page * pageList;
     const end = start + pageList;
     const nextList = cafeListArr.slice(start, end);
-    console.log(nextList);
-    console.log(cafeListArr);
     setCafeList((prev) => [...prev, ...nextList]);
     setPage((prev) => prev + 1);
     setLoading(false);

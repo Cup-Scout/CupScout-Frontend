@@ -39,7 +39,6 @@ const CafeWrapper = () => {
   };
 
   const getCafesByCategories = async (categorySet: Set<number>) => {
-    console.log(categorySet);
     const responses = await Promise.all(
       [...categorySet].map((id) =>
         fetch(
