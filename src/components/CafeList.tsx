@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import bottomArrow from '../assets/bottom-arrow.png';
 import sampleCafe from '../assets/sampleCafe.png';
@@ -31,6 +31,15 @@ interface commentList {
 const CafeList = ({ cafeListArr }: cafeListArrProps) => {
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [switchContent, setSwitchContent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState<number>(0);
+  const pageList = 6;
+
+  const [cafeList, setCafeList] = useState<cafeInfo[]>([]);
+
+  const target = useRef<HTMLDivElement | null>(null);
+  // const observer = useRef<IntersectionObserver | null>(null);
+
   const commentList: commentList[] = [
     {
       id: 1,
@@ -59,11 +68,48 @@ const CafeList = ({ cafeListArr }: cafeListArrProps) => {
     setSwitchContent((prev) => !prev);
   };
 
+  const callback = () => {
+    if (loading) return;
+    if (cafeList.length > cafeListArr.length) return;
+    setLoading(true);
+    const start = page * pageList;
+    const end = start + pageList;
+    const nextList = cafeListArr.slice(start, end);
+    console.log(nextList);
+    console.log(cafeListArr);
+    setCafeList((prev) => [...prev, ...nextList]);
+    setPage((prev) => prev + 1);
+    setLoading(false);
+  };
+
+  const observer = new IntersectionObserver((entries, _observer) => {
+    if (entries[0].isIntersecting) {
+      callback();
+    }
+  });
+
+  useEffect(() => {
+    if (target.current) {
+      observer.observe(target.current);
+    }
+    return () => {
+      observer.disconnect();
+    };
+  }, [page, cafeListArr]);
+
+  useEffect(() => {
+    if (cafeListArr.length < 7 || page !== 0) return;
+    const slicedCafeList = cafeListArr.slice(0, 6);
+    setCafeList(slicedCafeList);
+    //: page + 1
+    setPage((prev) => prev + 1);
+  }, [cafeListArr]);
+
   return (
     <Section>
       <ul>
-        {cafeListArr.length !== 0 &&
-          cafeListArr.map((value) => (
+        {cafeList.length !== 0 &&
+          cafeList.map((value) => (
             <CafeListLi
               key={value.id}
               className={expandedId === value.id ? 'expanded' : ''}
@@ -117,6 +163,12 @@ const CafeList = ({ cafeListArr }: cafeListArrProps) => {
               </>
             </CafeListLi>
           ))}
+        {cafeList.length < cafeListArr.length && (
+          <div
+            style={{ height: '10px', backgroundColor: 'red' }}
+            ref={target}
+          ></div>
+        )}
       </ul>
     </Section>
   );
