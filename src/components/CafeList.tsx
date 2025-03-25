@@ -124,6 +124,8 @@ const CafeList = ({ cafeListArr }: cafeListArrProps) => {
     setPage(1); // 다시 1로 시작
   }, [cafeListArr]);
 
+  //! 각 카페별 댓글 버튼을 누르면 그 카페에 대한 댓글 api 호출
+
   return (
     <Section>
       <ul>
@@ -145,14 +147,19 @@ const CafeList = ({ cafeListArr }: cafeListArrProps) => {
               <>
                 {switchContent ? (
                   <CafeCommentDiv>
-                    {commentList.map((value) => (
+                    {commentList ? (
                       <ul>
-                        <li>
-                          <p>{value.nickname}</p>
-                          <p>{value.content}</p>
-                        </li>
+                        {commentList.map((value) => (
+                          <li key={value.id}>
+                            <p>{value.nickname}</p>
+                            <p>{value.content}</p>
+                          </li>
+                        ))}
                       </ul>
-                    ))}
+                    ) : (
+                      <div>댓글 없음</div>
+                    )}
+
                     <ToggleButton onClick={toggleContent}>
                       카페 정보
                     </ToggleButton>
@@ -172,8 +179,6 @@ const CafeList = ({ cafeListArr }: cafeListArrProps) => {
                         <li>일 10 : 00 ~ 22 : 00</li>
                       </ul>
                     </div>
-                    <p>카페 이벤트</p>
-                    <p>카페 SNS URL</p>
                     <img src={sampleCafe} alt="" />
 
                     <ToggleButton onClick={toggleContent}>댓글</ToggleButton>
