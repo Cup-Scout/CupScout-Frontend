@@ -10,14 +10,16 @@ interface categoryInfo {
 }
 
 const Category = ({ selectedCategories, setSelectedCategories }: any) => {
-  const [categoryListArr, setCategoryListArr] = useState<categoryInfo[]>([]);
+  const [categoryMenuListArr, setCategoryMenuListArr] = useState<
+    categoryInfo[]
+  >([]);
 
   const getCategory = async () => {
     const response = await fetch(
       `${import.meta.env.VITE_APP_LOCAL_API_URL}/api/categories`,
     );
     const categoryList = await response.json();
-    setCategoryListArr(categoryList);
+    setCategoryMenuListArr(categoryList);
   };
 
   useEffect(() => {
@@ -33,8 +35,8 @@ const Category = ({ selectedCategories, setSelectedCategories }: any) => {
   return (
     <CategoryNav>
       <ul>
-        {categoryListArr.length !== 0 &&
-          categoryListArr.map((value) => (
+        {categoryMenuListArr.length !== 0 &&
+          categoryMenuListArr.map((value) => (
             <li
               key={value.id}
               onClick={() => selectCategory(value.id)}
