@@ -28,11 +28,30 @@ interface commentList {
   content: string;
 }
 
+interface openingHours {
+  event: null;
+  id: number;
+  name: string;
+  open_24h: null;
+  opening_hours: {
+    monday: { open: null | number; close: null | number };
+    tuesday: { open: null | number; close: null | number };
+    wednesday: { open: null | number; close: null | number };
+    thursday: { open: null | number; close: null | number };
+    friday: { open: null | number; close: null | number };
+    saturday: { open: null | number; close: null | number };
+    sunday: { open: null | number; close: null | number };
+  };
+}
+
 const CafeList = ({ cafeListArr }: cafeListArrProps) => {
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [switchContent, setSwitchContent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState<number>(0);
+  const [selectedCafeHour, setSelectedCafeHour] = useState<openingHours | null>(
+    null,
+  );
   const pageList = 6;
 
   const [cafeList, setCafeList] = useState<cafeInfo[]>([]);
@@ -55,16 +74,21 @@ const CafeList = ({ cafeListArr }: cafeListArrProps) => {
     },
   ];
 
-  const toggleExpand = (id: number) => {
+  const toggleExpand = async (id: number) => {
     if (expandedId === id) {
       setExpandedId(null); // 클릭한 항목이 이미 열려 있으면 닫기
     } else {
       setExpandedId(null); // 기존에 열려 있던 항목을 즉시 닫기
       setExpandedId(id);
+      const response = await fetch(
+        `${import.meta.env.VITE_APP_LOCAL_API_URL}/api/cafes/${id}/hours`,
+      );
+      const data = await response.json();
+      setSelectedCafeHour(data);
     }
   };
 
-  const toggleContent = () => {
+  const toggleContent = async () => {
     setSwitchContent((prev) => !prev);
   };
 
@@ -80,6 +104,7 @@ const CafeList = ({ cafeListArr }: cafeListArrProps) => {
     setPage((prev) => prev + 1);
     setLoading(false);
   };
+  import.meta.env.VITE_APP_LOCAL_API_URL;
 
   // const observer = new IntersectionObserver((entries, _observer) => {
   //   if (entries[0].isIntersecting) {
@@ -149,10 +174,10 @@ const CafeList = ({ cafeListArr }: cafeListArrProps) => {
                   <CafeCommentDiv>
                     {commentList ? (
                       <ul>
-                        {commentList.map((value) => (
-                          <li key={value.id}>
-                            <p>{value.nickname}</p>
-                            <p>{value.content}</p>
+                        {commentList.map((v) => (
+                          <li key={v.id}>
+                            <p>{v.nickname}</p>
+                            <p>{v.content}</p>
                           </li>
                         ))}
                       </ul>
@@ -170,13 +195,41 @@ const CafeList = ({ cafeListArr }: cafeListArrProps) => {
                     <div>
                       <span>영업시간 | </span>
                       <ul>
-                        <li>월 10 : 00 ~ 22 : 00</li>
-                        <li>화 10 : 00 ~ 22 : 00</li>
-                        <li>수 10 : 00 ~ 22 : 00</li>
-                        <li>목 10 : 00 ~ 22 : 00</li>
-                        <li>금 10 : 00 ~ 22 : 00</li>
-                        <li>토 10 : 00 ~ 22 : 00</li>
-                        <li>일 10 : 00 ~ 22 : 00</li>
+                        <li>
+                          월{' '}
+                          {`${selectedCafeHour?.opening_hours.tuesday.open ? selectedCafeHour?.opening_hours.tuesday.open : '정보 없음'} 
+                          ~ ${selectedCafeHour?.opening_hours.tuesday.close ? selectedCafeHour?.opening_hours.tuesday.open : '정보 없음'}`}
+                        </li>
+                        <li>
+                          화{' '}
+                          {`${selectedCafeHour?.opening_hours.wednesday.open ? selectedCafeHour?.opening_hours.wednesday.open : '정보 없음'} 
+                          ~ ${selectedCafeHour?.opening_hours.wednesday.close ? selectedCafeHour?.opening_hours.wednesday.open : '정보 없음'}`}
+                        </li>
+                        <li>
+                          수{' '}
+                          {`${selectedCafeHour?.opening_hours.thursday.open ? selectedCafeHour?.opening_hours.thursday.open : '정보 없음'} 
+                          ~ ${selectedCafeHour?.opening_hours.thursday.close ? selectedCafeHour?.opening_hours.thursday.open : '정보 없음'}`}
+                        </li>
+                        <li>
+                          목{' '}
+                          {`${selectedCafeHour?.opening_hours.friday.open ? selectedCafeHour?.opening_hours.friday.open : '정보 없음'} 
+                          ~ ${selectedCafeHour?.opening_hours.friday.close ? selectedCafeHour?.opening_hours.friday.open : '정보 없음'}`}
+                        </li>
+                        <li>
+                          금{' '}
+                          {`${selectedCafeHour?.opening_hours.saturday.open ? selectedCafeHour?.opening_hours.saturday.open : '정보 없음'} 
+                          ~ ${selectedCafeHour?.opening_hours.saturday.close ? selectedCafeHour?.opening_hours.saturday.open : '정보 없음'}`}
+                        </li>
+                        <li>
+                          토{' '}
+                          {`${selectedCafeHour?.opening_hours.monday.open ? selectedCafeHour?.opening_hours.monday.open : '정보 없음'} 
+                          ~ ${selectedCafeHour?.opening_hours.monday.close ? selectedCafeHour?.opening_hours.monday.open : '정보 없음'}`}
+                        </li>
+                        <li>
+                          일{' '}
+                          {`${selectedCafeHour?.opening_hours.sunday.open ? selectedCafeHour?.opening_hours.sunday.open : '정보 없음'} 
+                          ~ ${selectedCafeHour?.opening_hours.sunday.close ? selectedCafeHour?.opening_hours.sunday.open : '정보 없음'}`}
+                        </li>
                       </ul>
                     </div>
                     <img src={sampleCafe} alt="" />
