@@ -70,7 +70,8 @@ const CafeList = ({ cafeListArr }: cafeListArrProps) => {
 
   const callback = () => {
     if (loading) return;
-    if (cafeList.length > cafeListArr.length) return;
+    if (cafeList.length >= cafeListArr.length) return; // 여기도 setPage(0) 말고 그냥 return
+
     setLoading(true);
     const start = page * pageList;
     const end = start + pageList;
@@ -80,27 +81,47 @@ const CafeList = ({ cafeListArr }: cafeListArrProps) => {
     setLoading(false);
   };
 
-  const observer = new IntersectionObserver((entries, _observer) => {
-    if (entries[0].isIntersecting) {
-      callback();
-    }
-  });
+  // const observer = new IntersectionObserver((entries, _observer) => {
+  //   if (entries[0].isIntersecting) {
+  //     callback();
+  //   }
+  // });
+
+  // useEffect(() => {
+  //   if (target.current) {
+  //     observer.observe(target.current);
+  //   }
+  //   return () => {
+  //     observer.disconnect();
+  //   };
+  // }, [page, cafeListArr]);
 
   useEffect(() => {
-    if (target.current) {
-      observer.observe(target.current);
-    }
+    if (!target.current) return;
+
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        callback();
+      }
+    });
+
+    observer.observe(target.current);
+
     return () => {
       observer.disconnect();
     };
-  }, [page, cafeListArr]);
+  }, [callback, cafeListArr]); // 또는 그냥 []로 한 번만 생성해도 됨
 
   useEffect(() => {
-    if (cafeListArr.length < 7 || page !== 0) return;
-    const slicedCafeList = cafeListArr.slice(0, 6);
+    //: cafeListArr가 바뀔 때마다 초기화
+    if (cafeListArr.length < 7) {
+      setCafeList(cafeListArr);
+      setPage(1); // 1페이지만 보여주면 됨
+      return;
+    }
+    const slicedCafeList = cafeListArr.slice(0, pageList);
     setCafeList(slicedCafeList);
-    //: page + 1
-    setPage((prev) => prev + 1);
+    setPage(1); // 다시 1로 시작
   }, [cafeListArr]);
 
   return (
