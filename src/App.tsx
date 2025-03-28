@@ -1,4 +1,4 @@
-import styled, { ThemeProvider } from 'styled-components';
+import { ThemeProvider } from 'styled-components';
 import theme from './theme';
 import GlobalStyles from './globalStyle';
 import './App.css';
