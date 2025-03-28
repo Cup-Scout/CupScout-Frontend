@@ -89,7 +89,7 @@ const Maps = ({ cafeListArr }: any) => {
                 if (mapBounds.hasLatLng(position)) {
                   showMarker(map, marker);
                 } else {
-                  hideMarker(map, marker);
+                  hideMarker(marker);
                 }
               }
             };
@@ -99,14 +99,14 @@ const Maps = ({ cafeListArr }: any) => {
               marker.setMap(map);
             };
 
-            const hideMarker = (map: any, marker: any) => {
+            const hideMarker = (marker: any) => {
               if (!marker.setMap()) return;
               marker.setMap(null);
             };
 
             // 해당 마커의 인덱스를 seq라는 클로저 변수로 저장하는 이벤트 핸들러를 반환합니다.
-            const getClickHandler = (seq: any) => {
-              return function (e: any) {
+            const getClickHandler = () => {
+              return function () {
                 setClickMarkerInfo({ id, cafeName, addressDoro });
               };
             };
@@ -115,7 +115,7 @@ const Maps = ({ cafeListArr }: any) => {
               naver.maps.Event.addListener(
                 markers[j],
                 'click',
-                getClickHandler(j),
+                getClickHandler(),
               );
             }
           } catch (error) {
