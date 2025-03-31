@@ -2,7 +2,7 @@ import { useState } from 'react';
 import styled from 'styled-components';
 import searchIcon from '../assets/search-icon.png';
 
-const Search = ({ setCafeListArr }: any) => {
+const Search = ({ setCafeListArr, getOperatingStatus }: any) => {
   // const inputRef = useRef<HTMLInputElement | null>(null);
   const [value, setValue] = useState('');
 
@@ -20,7 +20,8 @@ const Search = ({ setCafeListArr }: any) => {
       `${import.meta.env.VITE_APP_LOCAL_API_URL}/api/cafes?name=${value}`,
     );
     const data = await response.json();
-    setCafeListArr(data);
+    const finalCafeInfo = await getOperatingStatus(data);
+    setCafeListArr(finalCafeInfo);
   };
 
   return (

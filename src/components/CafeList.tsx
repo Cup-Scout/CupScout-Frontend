@@ -16,13 +16,15 @@ interface cafeInfo {
   deleted: number;
   created: string;
   updated: string;
+  open_24h: number | null;
+  operation: string;
 }
 
 interface openingHours {
   event: null;
   id: number;
   name: string;
-  open_24h: null;
+  open_24h: number | null;
   opening_hours: {
     monday: { open: null | number; close: null | number };
     tuesday: { open: null | number; close: null | number };
@@ -151,7 +153,7 @@ const CafeList = ({
           <SelectedCafeDiv
             className={expandedId === selectedCafe.id ? 'expanded' : ''}
           >
-            <CafeTitleDiv>
+            <CafeTitleDiv operation={selectedCafe.operation}>
               <div>
                 <span></span>
                 {selectedCafe.name}
@@ -238,7 +240,7 @@ const CafeList = ({
               key={value.id}
               className={expandedId === value.id ? 'expanded' : ''}
             >
-              <CafeTitleDiv>
+              <CafeTitleDiv operation={value.operation}>
                 <div>
                   <span></span>
                   {value.name}
@@ -369,7 +371,7 @@ const CafeListLi = styled.li`
   }
 `;
 
-const CafeTitleDiv = styled.div`
+const CafeTitleDiv = styled.div<{ operation: string }>`
   padding: 14px 10px 14px 10px;
   display: flex;
   align-items: center;
@@ -381,7 +383,12 @@ const CafeTitleDiv = styled.div`
   }
   span {
     border-radius: 50%;
-    background-color: #36c557;
+    background-color: ${({ operation }) =>
+      operation === '영업중'
+        ? '#36c557'
+        : operation === '곧 영업종료'
+          ? '#D24040'
+          : '#828689'};
     width: 8px;
     height: 8px;
     display: block;
