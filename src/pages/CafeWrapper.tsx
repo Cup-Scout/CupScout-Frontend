@@ -21,14 +21,34 @@ interface cafeInfo {
   updated: string;
 }
 
+interface openingHours {
+  event: null;
+  id: number;
+  name: string;
+  open_24h: null;
+  opening_hours: {
+    monday: { open: null | number; close: null | number };
+    tuesday: { open: null | number; close: null | number };
+    wednesday: { open: null | number; close: null | number };
+    thursday: { open: null | number; close: null | number };
+    friday: { open: null | number; close: null | number };
+    saturday: { open: null | number; close: null | number };
+    sunday: { open: null | number; close: null | number };
+  };
+}
+
 const CafeWrapper = () => {
   const [cafeListArr, setCafeListArr] = useState<cafeInfo[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<Set<number>>(
     new Set(),
   );
+  const [selectedCafe, setSelectedCafe] = useState<cafeInfo | null>(null);
   const location = useLocation();
   const navigate = useNavigate();
-
+  const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [selectedCafeHour, setSelectedCafeHour] = useState<openingHours | null>(
+    null,
+  );
   const getAllCafeList = async () => {
     const response = await fetch(
       `${import.meta.env.VITE_APP_LOCAL_API_URL}/api/cafes`,
@@ -36,6 +56,22 @@ const CafeWrapper = () => {
     const data = await response.json();
     //* cafeList 변경됨
     setCafeListArr(data);
+  };
+
+  const toggleExpand = async (id: number) => {
+    if (expandedId === id) {
+      setExpandedId(null); // 클릭한 항목이 이미 열려 있으면 닫기
+    } else {
+      setExpandedId(null); // 기존에 열려 있던 항목을 즉시 닫기
+      setExpandedId(id);
+      const response = await fetch(
+        `${import.meta.env.VITE_APP_LOCAL_API_URL}/api/cafes/${id}/hours`,
+      );
+      const data = await response.json();
+      console.log(data);
+
+      setSelectedCafeHour(data);
+    }
   };
 
   const getCafesByCategories = async (categorySet: Set<number>) => {
@@ -91,8 +127,19 @@ const CafeWrapper = () => {
         selectedCategories={selectedCategories}
         setSelectedCategories={setSelectedCategories}
       />
-      <Maps cafeListArr={cafeListArr} />
-      <CafeList cafeListArr={cafeListArr} />
+      <Maps
+        cafeListArr={cafeListArr}
+        setSelectedCafe={setSelectedCafe}
+        selectedCafe={selectedCafe}
+        toggleExpand={toggleExpand}
+      />
+      <CafeList
+        cafeListArr={cafeListArr}
+        selectedCafe={selectedCafe}
+        toggleExpand={toggleExpand}
+        selectedCafeHour={selectedCafeHour}
+        expandedId={expandedId}
+      />
     </Main>
   );
 };

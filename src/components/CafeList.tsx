@@ -18,17 +18,6 @@ interface cafeInfo {
   updated: string;
 }
 
-interface cafeListArrProps {
-  cafeListArr: cafeInfo[];
-}
-
-interface commentList {
-  id: number;
-  nickname: string;
-  password: string;
-  content: string;
-}
-
 interface openingHours {
   event: null;
   id: number;
@@ -45,20 +34,37 @@ interface openingHours {
   };
 }
 
-const CafeList = ({ cafeListArr }: cafeListArrProps) => {
-  const [expandedId, setExpandedId] = useState<number | null>(null);
+interface cafeListArrProps {
+  cafeListArr: cafeInfo[];
+  selectedCafe: cafeInfo | null;
+  toggleExpand: (id: number) => void;
+  selectedCafeHour: openingHours | null;
+  expandedId: number | null;
+}
+
+interface commentList {
+  id: number;
+  nickname: string;
+  password: string;
+  content: string;
+}
+
+const CafeList = ({
+  cafeListArr,
+  selectedCafe,
+  toggleExpand,
+  selectedCafeHour,
+  expandedId,
+}: cafeListArrProps) => {
   const [switchContent, setSwitchContent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState<number>(0);
-  const [selectedCafeHour, setSelectedCafeHour] = useState<openingHours | null>(
-    null,
-  );
+
   const pageList = 6;
 
   const [cafeList, setCafeList] = useState<cafeInfo[]>([]);
 
   const target = useRef<HTMLDivElement | null>(null);
-  // const observer = useRef<IntersectionObserver | null>(null);
 
   const commentList: commentList[] = [
     {
@@ -74,20 +80,6 @@ const CafeList = ({ cafeListArr }: cafeListArrProps) => {
       content: '사람이 좀 많고 시끄럽긴 한데 넓어서 좋아요',
     },
   ];
-
-  const toggleExpand = async (id: number) => {
-    if (expandedId === id) {
-      setExpandedId(null); // 클릭한 항목이 이미 열려 있으면 닫기
-    } else {
-      setExpandedId(null); // 기존에 열려 있던 항목을 즉시 닫기
-      setExpandedId(id);
-      const response = await fetch(
-        `${import.meta.env.VITE_APP_LOCAL_API_URL}/api/cafes/${id}/hours`,
-      );
-      const data = await response.json();
-      setSelectedCafeHour(data);
-    }
-  };
 
   const toggleContent = async () => {
     setSwitchContent((prev) => !prev);
@@ -106,7 +98,6 @@ const CafeList = ({ cafeListArr }: cafeListArrProps) => {
       setLoading(false);
     }, 500);
   };
-  import.meta.env.VITE_APP_LOCAL_API_URL;
 
   // const observer = new IntersectionObserver((entries, _observer) => {
   //   if (entries[0].isIntersecting) {
@@ -155,6 +146,91 @@ const CafeList = ({ cafeListArr }: cafeListArrProps) => {
 
   return (
     <Section>
+      {selectedCafe && (
+        <SelectedCafeWrapper>
+          <SelectedCafeDiv
+            className={expandedId === selectedCafe.id ? 'expanded' : ''}
+          >
+            <CafeTitleDiv>
+              <div>
+                <span></span>
+                {selectedCafe.name}
+              </div>
+              <button onClick={() => toggleExpand(selectedCafe.id)}>
+                <img src={bottomArrow} alt="bottom arrow" />
+              </button>
+            </CafeTitleDiv>
+            <>
+              {switchContent ? (
+                <CafeCommentDiv>
+                  {commentList ? (
+                    <ul>
+                      {commentList.map((v) => (
+                        <li key={v.id}>
+                          <p>{v.nickname}</p>
+                          <p>{v.content}</p>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <div>댓글 없음</div>
+                  )}
+
+                  <ToggleButton onClick={toggleContent}>카페 정보</ToggleButton>
+                </CafeCommentDiv>
+              ) : (
+                <CafeInfoDiv>
+                  <p>{selectedCafe.description}</p>
+                  <div>
+                    <span>영업시간 | </span>
+                    <ul>
+                      <li>
+                        월{' '}
+                        {`${selectedCafeHour?.opening_hours.tuesday.open ? selectedCafeHour?.opening_hours.tuesday.open : '정보 없음'} 
+                          ~ ${selectedCafeHour?.opening_hours.tuesday.close ? selectedCafeHour?.opening_hours.tuesday.open : '정보 없음'}`}
+                      </li>
+                      <li>
+                        화{' '}
+                        {`${selectedCafeHour?.opening_hours.wednesday.open ? selectedCafeHour?.opening_hours.wednesday.open : '정보 없음'} 
+                          ~ ${selectedCafeHour?.opening_hours.wednesday.close ? selectedCafeHour?.opening_hours.wednesday.open : '정보 없음'}`}
+                      </li>
+                      <li>
+                        수{' '}
+                        {`${selectedCafeHour?.opening_hours.thursday.open ? selectedCafeHour?.opening_hours.thursday.open : '정보 없음'} 
+                          ~ ${selectedCafeHour?.opening_hours.thursday.close ? selectedCafeHour?.opening_hours.thursday.open : '정보 없음'}`}
+                      </li>
+                      <li>
+                        목{' '}
+                        {`${selectedCafeHour?.opening_hours.friday.open ? selectedCafeHour?.opening_hours.friday.open : '정보 없음'} 
+                          ~ ${selectedCafeHour?.opening_hours.friday.close ? selectedCafeHour?.opening_hours.friday.open : '정보 없음'}`}
+                      </li>
+                      <li>
+                        금{' '}
+                        {`${selectedCafeHour?.opening_hours.saturday.open ? selectedCafeHour?.opening_hours.saturday.open : '정보 없음'} 
+                          ~ ${selectedCafeHour?.opening_hours.saturday.close ? selectedCafeHour?.opening_hours.saturday.open : '정보 없음'}`}
+                      </li>
+                      <li>
+                        토{' '}
+                        {`${selectedCafeHour?.opening_hours.monday.open ? selectedCafeHour?.opening_hours.monday.open : '정보 없음'} 
+                          ~ ${selectedCafeHour?.opening_hours.monday.close ? selectedCafeHour?.opening_hours.monday.open : '정보 없음'}`}
+                      </li>
+                      <li>
+                        일{' '}
+                        {`${selectedCafeHour?.opening_hours.sunday.open ? selectedCafeHour?.opening_hours.sunday.open : '정보 없음'} 
+                          ~ ${selectedCafeHour?.opening_hours.sunday.close ? selectedCafeHour?.opening_hours.sunday.open : '정보 없음'}`}
+                      </li>
+                    </ul>
+                  </div>
+                  <img src={sampleCafe} alt="" />
+
+                  <ToggleButton onClick={toggleContent}>댓글</ToggleButton>
+                </CafeInfoDiv>
+              )}
+            </>
+          </SelectedCafeDiv>
+        </SelectedCafeWrapper>
+      )}
+
       <ul>
         {cafeList.length !== 0 &&
           cafeList.map((value) => (
@@ -243,7 +319,10 @@ const CafeList = ({ cafeListArr }: cafeListArrProps) => {
             </CafeListLi>
           ))}
         {cafeList.length < cafeListArr.length && (
-          <div style={{ height: '10px' }} ref={target}></div>
+          <div
+            style={{ height: '10px', backgroundColor: 'red' }}
+            ref={target}
+          ></div>
         )}
         {loading && <LoadingState />}
       </ul>
@@ -252,7 +331,32 @@ const CafeList = ({ cafeListArr }: cafeListArrProps) => {
 };
 
 const Section = styled.section`
+  overflow: hidden;
+  /* height: 420px; */
+  margin-top: 10px;
+  ul {
+    /* height: 100%; */
+    max-height: 300px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
   li {
+  }
+`;
+const SelectedCafeWrapper = styled.div`
+  padding: 10px 0;
+  border-bottom: 1px solid #9e9e9e;
+`;
+
+const SelectedCafeDiv = styled.div`
+  border: 1px solid #061fff;
+  border-radius: 10px;
+  overflow: hidden;
+  max-height: 54px;
+  transition: max-height 0.3s ease-in-out;
+
+  &.expanded {
+    max-height: 500px; /* 충분히 큰 값으로 설정 (콘텐츠에 따라 자동 조정) */
   }
 `;
 const CafeListLi = styled.li`
