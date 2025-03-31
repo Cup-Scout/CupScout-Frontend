@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
+import markerIcon from '../assets/marker.svg';
 
 interface cafeInfo {
   id: number;
@@ -149,6 +150,12 @@ const Maps = ({
       const marker = new naver.maps.Marker({
         position: location,
         map,
+        icon: {
+          url: markerIcon,
+          size: new naver.maps.Size(22, 35),
+          origin: new naver.maps.Point(0, 0),
+          anchor: new naver.maps.Point(11, 35),
+        },
       });
 
       markers.push(marker);

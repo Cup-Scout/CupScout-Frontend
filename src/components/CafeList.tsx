@@ -349,7 +349,7 @@ const SelectedCafeWrapper = styled.div`
 `;
 
 const SelectedCafeDiv = styled.div`
-  border: 1px solid #061fff;
+  border: 1px solid #9e076c;
   border-radius: 10px;
   overflow: hidden;
   max-height: 54px;
