@@ -19,13 +19,15 @@ interface cafeInfo {
   deleted: number;
   created: string;
   updated: string;
+  open_24h: number | null;
+  operation: string;
 }
 
 interface openingHours {
   event: null;
   id: number;
   name: string;
-  open_24h: null;
+  open_24h: number | null;
   opening_hours: {
     monday: { open: null | number; close: null | number };
     tuesday: { open: null | number; close: null | number };
@@ -49,13 +51,90 @@ const CafeWrapper = () => {
   const [selectedCafeHour, setSelectedCafeHour] = useState<openingHours | null>(
     null,
   );
+
+  const openStatus = async (id: number) => {
+    const today = new Date();
+    const day = today.getDay();
+    const dayOfWeek = [
+      'sunday',
+      'monday',
+      'tuesday',
+      'wednesday',
+      'thursday',
+      'friday',
+      'saturday',
+    ][day];
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_APP_LOCAL_API_URL}/api/cafes/${id}/hours/${dayOfWeek}`,
+      );
+
+      if (!response.ok) return { dayOfWeek, operatingHour: null };
+
+      const operatingHour = await response.json();
+      return { dayOfWeek, operatingHour };
+    } catch (e) {
+      console.error(`Failed to fetch cafe hours for id ${id}:`, e);
+      return { dayOfWeek, operatingHour: null };
+    }
+  };
+
+  const getOperatingStatus = async (data: any) => {
+    const finalCafeInfo = await Promise.all(
+      data.map(async (value: any) => {
+        const { operatingHour } = await openStatus(value.id);
+        if (!operatingHour) {
+          return {
+            ...value,
+            open_24h: null,
+            operation: null,
+          };
+        }
+
+        const today: Date = new Date();
+        const year = today.getFullYear();
+        const month = today.getMonth();
+        const day = today.getDate();
+
+        const openTime = new Date(year, month, day, operatingHour.open, 0, 0);
+        const closeTime = new Date(year, month, day, operatingHour.close, 0, 0);
+        const almostCloseTime = new Date(
+          year,
+          month,
+          day,
+          operatingHour.close - 1,
+          0,
+          0,
+        );
+        let isOperating: string;
+        if (today >= openTime && today < almostCloseTime) {
+          isOperating = '영업중';
+        } else if (today >= almostCloseTime && today < closeTime) {
+          isOperating = '곧 영업종료';
+        } else {
+          isOperating = '영업종료';
+        }
+
+        return {
+          ...value,
+          open_24h: operatingHour.open_24h,
+          operation: isOperating,
+        };
+      }),
+    );
+    return finalCafeInfo;
+  };
+
   const getAllCafeList = async () => {
     const response = await fetch(
       `${import.meta.env.VITE_APP_LOCAL_API_URL}/api/cafes`,
     );
     const data = await response.json();
     //* cafeList 변경됨
-    setCafeListArr(data);
+
+    const finalCafeInfo = await getOperatingStatus(data);
+    setCafeListArr(finalCafeInfo);
   };
 
   const toggleExpand = async (id: number) => {
@@ -86,9 +165,9 @@ const CafeWrapper = () => {
     const merged = Array.from(
       new Set(responses.flat().map((item) => JSON.stringify(item))),
     ).map((item) => JSON.parse(item));
-
+    const finalCafeInfo = await getOperatingStatus(merged);
     //* cafeList 변경됨
-    setCafeListArr(merged);
+    setCafeListArr(finalCafeInfo);
   };
 
   //: 초기 진입 시 한 번만 실행
@@ -122,7 +201,10 @@ const CafeWrapper = () => {
 
   return (
     <Main className="wrapper">
-      <Search setCafeListArr={setCafeListArr} />
+      <Search
+        setCafeListArr={setCafeListArr}
+        getOperatingStatus={getOperatingStatus}
+      />
       <Category
         selectedCategories={selectedCategories}
         setSelectedCategories={setSelectedCategories}

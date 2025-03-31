@@ -14,6 +14,8 @@ interface cafeInfo {
   deleted: number;
   created: string;
   updated: string;
+  open_24h: number | null;
+  operation: string;
 }
 interface markerInfo {
   id: number;
