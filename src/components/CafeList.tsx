@@ -319,10 +319,7 @@ const CafeList = ({
             </CafeListLi>
           ))}
         {cafeList.length < cafeListArr.length && (
-          <div
-            style={{ height: '10px', backgroundColor: 'red' }}
-            ref={target}
-          ></div>
+          <div style={{ height: '10px' }} ref={target}></div>
         )}
         {loading && <LoadingState />}
       </ul>
