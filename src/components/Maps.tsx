@@ -20,7 +20,12 @@ interface markerInfo {
   cafeName: string;
 }
 
-const Maps = ({ cafeListArr }: any) => {
+const Maps = ({
+  cafeListArr,
+  setSelectedCafe,
+  selectedCafe,
+  toggleExpand,
+}: any) => {
   const mapRef = useRef<HTMLDivElement | null>(null);
   const [clickMarkerInfo, setClickMarkerInfo] = useState<markerInfo | null>(
     null,
@@ -53,7 +58,7 @@ const Maps = ({ cafeListArr }: any) => {
         const location = new naver.maps.LatLng(37.5666103, 126.9783882);
         map = setMap(naver, location);
       }
-      let cafeList;
+      let cafeList: cafeInfo[];
       if (cafeListArr === null) {
         cafeList = await getCafe();
       } else {
@@ -104,10 +109,20 @@ const Maps = ({ cafeListArr }: any) => {
               marker.setMap(null);
             };
 
-            // 해당 마커의 인덱스를 seq라는 클로저 변수로 저장하는 이벤트 핸들러를 반환합니다.
+            const openSelectedCafeInfo = (id: number) => {
+              cafeList.forEach((cafe) => {
+                if (cafe.id === id) {
+                  setSelectedCafe(cafe);
+                }
+              });
+            };
+
+            // 해당 마커의 인덱스를 seq라는 클로저 변수로 저장하는 이벤트 핸들러를 반환
             const getClickHandler = () => {
               return function () {
                 setClickMarkerInfo({ id, cafeName, addressDoro });
+                openSelectedCafeInfo(id);
+                toggleExpand(id);
               };
             };
 
