@@ -97,17 +97,36 @@ const CafeWrapper = () => {
         const month = today.getMonth();
         const day = today.getDate();
 
-        const openTime = new Date(year, month, day, operatingHour.open, 0, 0);
-        const closeTime = new Date(year, month, day, operatingHour.close, 0, 0);
+        let formatMonth;
+        let formatDay;
+
+        if (month + 1 < 10) {
+          formatMonth = `0${month + 1}`;
+        } else {
+          formatMonth = `${month + 1}`;
+        }
+
+        if (day < 10) {
+          formatDay = `0${day}`;
+        } else {
+          formatDay = day;
+        }
+
+        const openTime = new Date(
+          `${year}-${formatMonth}-${formatDay}T${operatingHour.open}:00`,
+        );
+
+        const closeTime = new Date(
+          `${year}-${formatMonth}-${formatDay}T${operatingHour.close}:00`,
+        );
+
+        const closeTimeNumber = closeTime.getHours();
+
         const almostCloseTime = new Date(
-          year,
-          month,
-          day,
-          operatingHour.close - 1,
-          0,
-          0,
+          `${year}-${formatMonth}-${formatDay}T${closeTimeNumber - 1}:00`,
         );
         let isOperating: string;
+
         if (today >= openTime && today < almostCloseTime) {
           isOperating = '영업중';
         } else if (today >= almostCloseTime && today < closeTime) {
@@ -148,7 +167,6 @@ const CafeWrapper = () => {
       );
       const data = await response.json();
       console.log(data);
-
       setSelectedCafeHour(data);
     }
   };
