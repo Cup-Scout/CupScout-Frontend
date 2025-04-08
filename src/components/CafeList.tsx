@@ -49,6 +49,10 @@ interface commentList {
   nickname: string;
   password: string;
   content: string;
+  cafe_id: 1;
+  created: string;
+  deleted: 0;
+  updated: string;
 }
 
 const CafeList = ({
@@ -61,6 +65,7 @@ const CafeList = ({
   const [switchContent, setSwitchContent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState<number>(0);
+  const [commentList, setCommentList] = useState<commentList[]>([]);
 
   const pageList = 6;
 
@@ -68,23 +73,17 @@ const CafeList = ({
 
   const target = useRef<HTMLDivElement | null>(null);
 
-  const commentList: commentList[] = [
-    {
-      id: 1,
-      nickname: 'wlgus',
-      password: '1111',
-      content: '책도 많고 재밌다',
-    },
-    {
-      id: 2,
-      nickname: 'tnals',
-      password: '2222',
-      content: '사람이 좀 많고 시끄럽긴 한데 넓어서 좋아요',
-    },
-  ];
+  const getComment = async (id: number | null) => {
+    const response = await fetch(
+      `${import.meta.env.VITE_APP_LOCAL_API_URL}/api/comments/${id}`,
+    );
+    const data = await response.json();
+    setCommentList(data);
+  };
 
-  const toggleContent = async () => {
+  const toggleContent = async (id: number | null) => {
     setSwitchContent((prev) => !prev);
+    if (id) getComment(id);
   };
 
   const callback = () => {
@@ -100,21 +99,6 @@ const CafeList = ({
       setLoading(false);
     }, 500);
   };
-
-  // const observer = new IntersectionObserver((entries, _observer) => {
-  //   if (entries[0].isIntersecting) {
-  //     callback();
-  //   }
-  // });
-
-  // useEffect(() => {
-  //   if (target.current) {
-  //     observer.observe(target.current);
-  //   }
-  //   return () => {
-  //     observer.disconnect();
-  //   };
-  // }, [page, cafeListArr]);
 
   useEffect(() => {
     if (!target.current) return;
@@ -178,7 +162,9 @@ const CafeList = ({
                     <div>댓글 없음</div>
                   )}
 
-                  <ToggleButton onClick={toggleContent}>카페 정보</ToggleButton>
+                  <ToggleButton onClick={() => toggleContent(null)}>
+                    카페 정보
+                  </ToggleButton>
                 </CafeCommentDiv>
               ) : (
                 <CafeInfoDiv>
@@ -188,44 +174,47 @@ const CafeList = ({
                     <ul>
                       <li>
                         월{' '}
-                        {`${selectedCafeHour?.opening_hours.tuesday.open ? selectedCafeHour?.opening_hours.tuesday.open : '정보 없음'} 
-                          ~ ${selectedCafeHour?.opening_hours.tuesday.close ? selectedCafeHour?.opening_hours.tuesday.open : '정보 없음'}`}
+                        {`${selectedCafeHour?.opening_hours.monday.open ? selectedCafeHour?.opening_hours.monday.open : '휴뮤'} 
+                          ~ ${selectedCafeHour?.opening_hours.monday.close ? selectedCafeHour?.opening_hours.monday.close : '휴뮤'}`}
                       </li>
                       <li>
                         화{' '}
-                        {`${selectedCafeHour?.opening_hours.wednesday.open ? selectedCafeHour?.opening_hours.wednesday.open : '정보 없음'} 
-                          ~ ${selectedCafeHour?.opening_hours.wednesday.close ? selectedCafeHour?.opening_hours.wednesday.open : '정보 없음'}`}
+                        {`${selectedCafeHour?.opening_hours.tuesday.open ? selectedCafeHour?.opening_hours.tuesday.open : '휴뮤'} 
+                          ~ ${selectedCafeHour?.opening_hours.tuesday.close ? selectedCafeHour?.opening_hours.tuesday.close : '휴뮤'}`}
                       </li>
                       <li>
                         수{' '}
-                        {`${selectedCafeHour?.opening_hours.thursday.open ? selectedCafeHour?.opening_hours.thursday.open : '정보 없음'} 
-                          ~ ${selectedCafeHour?.opening_hours.thursday.close ? selectedCafeHour?.opening_hours.thursday.open : '정보 없음'}`}
+                        {`${selectedCafeHour?.opening_hours.wednesday.open ? selectedCafeHour?.opening_hours.wednesday.open : '휴뮤'} 
+                          ~ ${selectedCafeHour?.opening_hours.wednesday.close ? selectedCafeHour?.opening_hours.wednesday.close : '휴뮤'}`}
                       </li>
                       <li>
                         목{' '}
-                        {`${selectedCafeHour?.opening_hours.friday.open ? selectedCafeHour?.opening_hours.friday.open : '정보 없음'} 
-                          ~ ${selectedCafeHour?.opening_hours.friday.close ? selectedCafeHour?.opening_hours.friday.open : '정보 없음'}`}
+                        {`${selectedCafeHour?.opening_hours.thursday.open ? selectedCafeHour?.opening_hours.thursday.open : '휴뮤'} 
+                          ~ ${selectedCafeHour?.opening_hours.thursday.close ? selectedCafeHour?.opening_hours.thursday.close : '휴뮤'}`}
                       </li>
                       <li>
                         금{' '}
-                        {`${selectedCafeHour?.opening_hours.saturday.open ? selectedCafeHour?.opening_hours.saturday.open : '정보 없음'} 
-                          ~ ${selectedCafeHour?.opening_hours.saturday.close ? selectedCafeHour?.opening_hours.saturday.open : '정보 없음'}`}
+                        {`${selectedCafeHour?.opening_hours.friday.open ? selectedCafeHour?.opening_hours.friday.open : '휴뮤'} 
+                          ~ ${selectedCafeHour?.opening_hours.friday.close ? selectedCafeHour?.opening_hours.friday.close : '휴뮤'}`}
                       </li>
                       <li>
                         토{' '}
-                        {`${selectedCafeHour?.opening_hours.monday.open ? selectedCafeHour?.opening_hours.monday.open : '정보 없음'} 
-                          ~ ${selectedCafeHour?.opening_hours.monday.close ? selectedCafeHour?.opening_hours.monday.open : '정보 없음'}`}
+                        {`${selectedCafeHour?.opening_hours.saturday.open ? selectedCafeHour?.opening_hours.saturday.open : '휴뮤'} 
+                          ~ ${selectedCafeHour?.opening_hours.saturday.close ? selectedCafeHour?.opening_hours.saturday.close : '휴뮤'}`}
                       </li>
+
                       <li>
                         일{' '}
-                        {`${selectedCafeHour?.opening_hours.sunday.open ? selectedCafeHour?.opening_hours.sunday.open : '정보 없음'} 
-                          ~ ${selectedCafeHour?.opening_hours.sunday.close ? selectedCafeHour?.opening_hours.sunday.open : '정보 없음'}`}
+                        {`${selectedCafeHour?.opening_hours.sunday.open ? selectedCafeHour?.opening_hours.sunday.open : '휴뮤'} 
+                          ~ ${selectedCafeHour?.opening_hours.sunday.close ? selectedCafeHour?.opening_hours.sunday.close : '휴뮤'}`}
                       </li>
                     </ul>
                   </div>
                   <img src={sampleCafe} alt="" />
 
-                  <ToggleButton onClick={toggleContent}>댓글</ToggleButton>
+                  <ToggleButton onClick={() => toggleContent(selectedCafe.id)}>
+                    댓글
+                  </ToggleButton>
                 </CafeInfoDiv>
               )}
             </>
@@ -258,6 +247,7 @@ const CafeList = ({
                           <li key={v.id}>
                             <p>{v.nickname}</p>
                             <p>{v.content}</p>
+                            <p>{v.created.slice(0, 10)}</p>
                           </li>
                         ))}
                       </ul>
@@ -265,7 +255,7 @@ const CafeList = ({
                       <div>댓글 없음</div>
                     )}
 
-                    <ToggleButton onClick={toggleContent}>
+                    <ToggleButton onClick={() => toggleContent(null)}>
                       카페 정보
                     </ToggleButton>
                   </CafeCommentDiv>
@@ -277,44 +267,47 @@ const CafeList = ({
                       <ul>
                         <li>
                           월{' '}
-                          {`${selectedCafeHour?.opening_hours.tuesday.open ? selectedCafeHour?.opening_hours.tuesday.open : '정보 없음'} 
-                          ~ ${selectedCafeHour?.opening_hours.tuesday.close ? selectedCafeHour?.opening_hours.tuesday.open : '정보 없음'}`}
+                          {`${selectedCafeHour?.opening_hours.monday.open ? selectedCafeHour?.opening_hours.monday.open : '휴뮤'} 
+                          ~ ${selectedCafeHour?.opening_hours.monday.close ? selectedCafeHour?.opening_hours.monday.close : '휴뮤'}`}
                         </li>
                         <li>
                           화{' '}
-                          {`${selectedCafeHour?.opening_hours.wednesday.open ? selectedCafeHour?.opening_hours.wednesday.open : '정보 없음'} 
-                          ~ ${selectedCafeHour?.opening_hours.wednesday.close ? selectedCafeHour?.opening_hours.wednesday.open : '정보 없음'}`}
+                          {`${selectedCafeHour?.opening_hours.tuesday.open ? selectedCafeHour?.opening_hours.tuesday.open : '휴뮤'} 
+                          ~ ${selectedCafeHour?.opening_hours.tuesday.close ? selectedCafeHour?.opening_hours.tuesday.close : '휴뮤'}`}
                         </li>
                         <li>
                           수{' '}
-                          {`${selectedCafeHour?.opening_hours.thursday.open ? selectedCafeHour?.opening_hours.thursday.open : '정보 없음'} 
-                          ~ ${selectedCafeHour?.opening_hours.thursday.close ? selectedCafeHour?.opening_hours.thursday.open : '정보 없음'}`}
+                          {`${selectedCafeHour?.opening_hours.wednesday.open ? selectedCafeHour?.opening_hours.wednesday.open : '휴뮤'} 
+                          ~ ${selectedCafeHour?.opening_hours.wednesday.close ? selectedCafeHour?.opening_hours.wednesday.close : '휴뮤'}`}
                         </li>
                         <li>
                           목{' '}
-                          {`${selectedCafeHour?.opening_hours.friday.open ? selectedCafeHour?.opening_hours.friday.open : '정보 없음'} 
-                          ~ ${selectedCafeHour?.opening_hours.friday.close ? selectedCafeHour?.opening_hours.friday.open : '정보 없음'}`}
+                          {`${selectedCafeHour?.opening_hours.thursday.open ? selectedCafeHour?.opening_hours.thursday.open : '휴뮤'} 
+                          ~ ${selectedCafeHour?.opening_hours.thursday.close ? selectedCafeHour?.opening_hours.thursday.close : '휴뮤'}`}
                         </li>
                         <li>
                           금{' '}
-                          {`${selectedCafeHour?.opening_hours.saturday.open ? selectedCafeHour?.opening_hours.saturday.open : '정보 없음'} 
-                          ~ ${selectedCafeHour?.opening_hours.saturday.close ? selectedCafeHour?.opening_hours.saturday.open : '정보 없음'}`}
+                          {`${selectedCafeHour?.opening_hours.friday.open ? selectedCafeHour?.opening_hours.friday.open : '휴뮤'} 
+                          ~ ${selectedCafeHour?.opening_hours.friday.close ? selectedCafeHour?.opening_hours.friday.close : '휴뮤'}`}
                         </li>
                         <li>
                           토{' '}
-                          {`${selectedCafeHour?.opening_hours.monday.open ? selectedCafeHour?.opening_hours.monday.open : '정보 없음'} 
-                          ~ ${selectedCafeHour?.opening_hours.monday.close ? selectedCafeHour?.opening_hours.monday.open : '정보 없음'}`}
+                          {`${selectedCafeHour?.opening_hours.saturday.open ? selectedCafeHour?.opening_hours.saturday.open : '휴뮤'} 
+                          ~ ${selectedCafeHour?.opening_hours.saturday.close ? selectedCafeHour?.opening_hours.saturday.close : '휴뮤'}`}
                         </li>
+
                         <li>
                           일{' '}
-                          {`${selectedCafeHour?.opening_hours.sunday.open ? selectedCafeHour?.opening_hours.sunday.open : '정보 없음'} 
-                          ~ ${selectedCafeHour?.opening_hours.sunday.close ? selectedCafeHour?.opening_hours.sunday.open : '정보 없음'}`}
+                          {`${selectedCafeHour?.opening_hours.sunday.open ? selectedCafeHour?.opening_hours.sunday.open : '휴뮤'} 
+                          ~ ${selectedCafeHour?.opening_hours.sunday.close ? selectedCafeHour?.opening_hours.sunday.close : '휴뮤'}`}
                         </li>
                       </ul>
                     </div>
                     <img src={sampleCafe} alt="" />
 
-                    <ToggleButton onClick={toggleContent}>댓글</ToggleButton>
+                    <ToggleButton onClick={() => toggleContent(value.id)}>
+                      댓글
+                    </ToggleButton>
                   </CafeInfoDiv>
                 )}
               </>
@@ -428,13 +421,28 @@ const CafeInfoDiv = styled.div`
 const CafeCommentDiv = styled.div`
   padding: 0 26px 14px 26px;
   ul {
+    height: 180px;
     li {
       font-size: 12px;
       display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+      p:nth-of-type(2) {
+        text-align: left;
+        flex: 1;
+      }
     }
   }
   p:first-child {
     margin-right: 10px;
+    width: 56px;
+  }
+  p:last-child {
+    margin-left: 5px;
+    width: 50px;
+    font-size: 8px;
+    color: #9e9e9e;
   }
 `;
 
