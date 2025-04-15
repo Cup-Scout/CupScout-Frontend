@@ -42,6 +42,7 @@ interface cafeListArrProps {
   toggleExpand: (id: number) => void;
   selectedCafeHour: openingHours | null;
   expandedId: number | null;
+  todayHours: { open: string; close: string };
 }
 
 interface commentList {
@@ -57,6 +58,7 @@ const CafeList = ({
   toggleExpand,
   selectedCafeHour,
   expandedId,
+  todayHours,
 }: cafeListArrProps) => {
   const [switchContent, setSwitchContent] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -159,7 +161,7 @@ const CafeList = ({
                 {selectedCafe.name}
               </div>
               <button onClick={() => toggleExpand(selectedCafe.id)}>
-                <img src={bottomArrow} alt="bottom arrow" />
+                <img src={bottomArrow} alt="카페 정보 확인하기" />
               </button>
             </CafeTitleDiv>
             <>
@@ -184,7 +186,10 @@ const CafeList = ({
                 <CafeInfoDiv>
                   <p>{selectedCafe.description}</p>
                   <div>
-                    <span>영업시간 | </span>
+                    <span>
+                      영업시간 | {todayHours.open} ~ {todayHours.close}
+                      <img src={bottomArrow} alt="모든 영업시간 확인하기" />
+                    </span>
                     <ul>
                       <li>
                         월{' '}
@@ -273,7 +278,10 @@ const CafeList = ({
                   <CafeInfoDiv>
                     <p>{value.description}</p>
                     <div>
-                      <span>영업시간 | </span>
+                      <span>
+                        영업시간 | {todayHours.open} ~ {todayHours.close}
+                        <img src={bottomArrow} alt="모든 영업시간 확인하기" />
+                      </span>
                       <ul>
                         <li>
                           월{' '}
@@ -331,10 +339,8 @@ const CafeList = ({
 
 const Section = styled.section`
   overflow: hidden;
-  /* height: 420px; */
   margin-top: 10px;
   ul {
-    /* height: 100%; */
     max-height: 300px;
     overflow-y: auto;
     overflow-x: hidden;
@@ -411,9 +417,15 @@ const CafeInfoDiv = styled.div`
     font-size: 12px;
   }
   div {
-    display: flex;
+    span {
+      cursor: pointer;
+      img {
+        width: 8px;
+        margin-left: 5px;
+      }
+    }
     ul {
-      margin-left: 5px;
+      margin-top: 5px;
       li {
         margin-bottom: 1px;
       }

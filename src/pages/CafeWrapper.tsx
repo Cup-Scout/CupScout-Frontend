@@ -39,6 +39,11 @@ interface openingHours {
   };
 }
 
+interface todayHours {
+  open: string;
+  close: string;
+}
+
 const CafeWrapper = () => {
   const [cafeListArr, setCafeListArr] = useState<cafeInfo[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<Set<number>>(
@@ -51,6 +56,11 @@ const CafeWrapper = () => {
   const [selectedCafeHour, setSelectedCafeHour] = useState<openingHours | null>(
     null,
   );
+
+  const [todayHours, setTodayHours] = useState<todayHours>({
+    open: '',
+    close: '',
+  });
 
   const openStatus = async (id: number) => {
     const today = new Date();
@@ -166,7 +176,20 @@ const CafeWrapper = () => {
         `${import.meta.env.VITE_APP_LOCAL_API_URL}/api/cafes/${id}/hours`,
       );
       const data = await response.json();
-      console.log(data);
+      const today = new Date().getDay();
+      const dayOfWeek = [
+        'sunday',
+        'monday',
+        'tuesday',
+        'wednesday',
+        'thursday',
+        'friday',
+        'saturday',
+      ][today];
+
+      const todayOpen = data.opening_hours[dayOfWeek].open;
+      const todayClose = data.opening_hours[dayOfWeek].close;
+      setTodayHours({ open: todayOpen, close: todayClose });
       setSelectedCafeHour(data);
     }
   };
@@ -239,6 +262,7 @@ const CafeWrapper = () => {
         toggleExpand={toggleExpand}
         selectedCafeHour={selectedCafeHour}
         expandedId={expandedId}
+        todayHours={todayHours}
       />
     </Main>
   );
