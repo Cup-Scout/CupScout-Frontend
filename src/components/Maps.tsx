@@ -152,12 +152,12 @@ const Maps = ({
       const marker = new naver.maps.Marker({
         position: location,
         map,
-        icon: {
-          url: markerIcon,
-          size: new naver.maps.Size(22, 35),
-          origin: new naver.maps.Point(0, 0),
-          anchor: new naver.maps.Point(11, 35),
-        },
+        // icon: {
+        //   url: markerIcon,
+        //   size: new naver.maps.Size(22, 35),
+        //   origin: new naver.maps.Point(0, 0),
+        //   anchor: new naver.maps.Point(11, 35),
+        // },
       });
 
       markers.push(marker);

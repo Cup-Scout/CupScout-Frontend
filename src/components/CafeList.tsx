@@ -52,6 +52,10 @@ interface commentList {
   nickname: string;
   password: string;
   content: string;
+  cafe_id: 1;
+  created: string;
+  deleted: 0;
+  updated: string;
 }
 
 const CafeList = ({
@@ -67,6 +71,7 @@ const CafeList = ({
   const [switchContent, setSwitchContent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState<number>(0);
+  const [commentList, setCommentList] = useState<commentList[]>([]);
 
   const pageList = 6;
 
@@ -74,20 +79,6 @@ const CafeList = ({
 
   const target = useRef<HTMLDivElement | null>(null);
 
-  const commentList: commentList[] = [
-    {
-      id: 1,
-      nickname: 'wlgus',
-      password: '1111',
-      content: '책도 많고 재밌다',
-    },
-    {
-      id: 2,
-      nickname: 'tnals',
-      password: '2222',
-      content: '사람이 좀 많고 시끄럽긴 한데 넓어서 좋아요',
-    },
-  ];
 
   const weekDays = [
     { key: 'monday', label: '월' },
@@ -99,13 +90,23 @@ const CafeList = ({
     { key: 'sunday', label: '일' },
   ];
 
-  const toggleContent = async () => {
+
+  const getComment = async (id: number | null) => {
+    const response = await fetch(
+      `${import.meta.env.VITE_APP_LOCAL_API_URL}/api/comments/${id}`,
+    );
+    const data = await response.json();
+    setCommentList(data);
+  };
+
+  const toggleContent = async (id: number | null) => {
     setSwitchContent((prev) => !prev);
+    if (id) getComment(id);
   };
 
   const callback = useCallback(() => {
     if (loading) return;
-    if (cafeList.length >= cafeListArr.length) return; // 여기도 setPage(0) 말고 그냥 return
+    if (cafeList.length >= cafeListArr.length) return; 
     setLoading(true);
     setTimeout(() => {
       const start = page * pageList;
@@ -183,7 +184,9 @@ const CafeList = ({
                     <div>댓글 없음</div>
                   )}
 
-                  <ToggleButton onClick={toggleContent}>카페 정보</ToggleButton>
+                  <ToggleButton onClick={() => toggleContent(null)}>
+                    카페 정보
+                  </ToggleButton>
                 </CafeCommentDiv>
               ) : (
                 <CafeInfoDiv>
@@ -209,11 +212,14 @@ const CafeList = ({
                           </li>
                         );
                       })}
+
                     </ul>
                   </div>
                   <img src={sampleCafe} alt="" />
 
-                  <ToggleButton onClick={toggleContent}>댓글</ToggleButton>
+                  <ToggleButton onClick={() => toggleContent(selectedCafe.id)}>
+                    댓글
+                  </ToggleButton>
                 </CafeInfoDiv>
               )}
             </>
@@ -246,6 +252,7 @@ const CafeList = ({
                           <li key={v.id}>
                             <p>{v.nickname}</p>
                             <p>{v.content}</p>
+                            <p>{v.created.slice(0, 10)}</p>
                           </li>
                         ))}
                       </ul>
@@ -253,7 +260,7 @@ const CafeList = ({
                       <div>댓글 없음</div>
                     )}
 
-                    <ToggleButton onClick={toggleContent}>
+                    <ToggleButton onClick={() => toggleContent(null)}>
                       카페 정보
                     </ToggleButton>
                   </CafeCommentDiv>
@@ -281,11 +288,14 @@ const CafeList = ({
                             </li>
                           );
                         })}
+
                       </ul>
                     </div>
                     <img src={sampleCafe} alt="" />
 
-                    <ToggleButton onClick={toggleContent}>댓글</ToggleButton>
+                    <ToggleButton onClick={() => toggleContent(value.id)}>
+                      댓글
+                    </ToggleButton>
                   </CafeInfoDiv>
                 )}
               </>
@@ -414,13 +424,28 @@ const CafeInfoDiv = styled.div`
 const CafeCommentDiv = styled.div`
   padding: 0 26px 14px 26px;
   ul {
+    height: 180px;
     li {
       font-size: 12px;
       display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+      p:nth-of-type(2) {
+        text-align: left;
+        flex: 1;
+      }
     }
   }
   p:first-child {
     margin-right: 10px;
+    width: 56px;
+  }
+  p:last-child {
+    margin-left: 5px;
+    width: 50px;
+    font-size: 8px;
+    color: #9e9e9e;
   }
 `;
 
