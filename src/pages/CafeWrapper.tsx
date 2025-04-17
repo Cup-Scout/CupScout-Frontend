@@ -56,6 +56,7 @@ const CafeWrapper = () => {
   const [selectedCafeHour, setSelectedCafeHour] = useState<openingHours | null>(
     null,
   );
+  const [test, setTest] = useState<boolean>(false);
 
   const [todayHours, setTodayHours] = useState<todayHours>({
     open: '',
@@ -168,9 +169,11 @@ const CafeWrapper = () => {
 
   const toggleExpand = async (id: number) => {
     if (expandedId === id) {
-      setExpandedId(null); // 클릭한 항목이 이미 열려 있으면 닫기
+      setExpandedId(null); //* 클릭한 항목이 이미 열려 있으면 닫기
+      setTest(false);
     } else {
-      setExpandedId(null); // 기존에 열려 있던 항목을 즉시 닫기
+      setExpandedId(null); //* 기존에 열려 있던 항목을 즉시 닫기
+      setTest(false);
       setExpandedId(id);
       const response = await fetch(
         `${import.meta.env.VITE_APP_LOCAL_API_URL}/api/cafes/${id}/hours`,
@@ -263,6 +266,8 @@ const CafeWrapper = () => {
         selectedCafeHour={selectedCafeHour}
         expandedId={expandedId}
         todayHours={todayHours}
+        test={test}
+        setTest={setTest}
       />
     </Main>
   );

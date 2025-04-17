@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import bottomArrow from '../assets/bottom-arrow.png';
 import sampleCafe from '../assets/sampleCafe.png';
@@ -43,6 +43,8 @@ interface cafeListArrProps {
   selectedCafeHour: openingHours | null;
   expandedId: number | null;
   todayHours: { open: string; close: string };
+  test: boolean;
+  setTest: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 interface commentList {
@@ -59,6 +61,8 @@ const CafeList = ({
   selectedCafeHour,
   expandedId,
   todayHours,
+  test,
+  setTest,
 }: cafeListArrProps) => {
   const [switchContent, setSwitchContent] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -85,11 +89,21 @@ const CafeList = ({
     },
   ];
 
+  const weekDays = [
+    { key: 'monday', label: '월' },
+    { key: 'tuesday', label: '화' },
+    { key: 'wednesday', label: '수' },
+    { key: 'thursday', label: '목' },
+    { key: 'friday', label: '금' },
+    { key: 'saturday', label: '토' },
+    { key: 'sunday', label: '일' },
+  ];
+
   const toggleContent = async () => {
     setSwitchContent((prev) => !prev);
   };
 
-  const callback = () => {
+  const callback = useCallback(() => {
     if (loading) return;
     if (cafeList.length >= cafeListArr.length) return; // 여기도 setPage(0) 말고 그냥 return
     setLoading(true);
@@ -101,22 +115,7 @@ const CafeList = ({
       setPage((prev) => prev + 1);
       setLoading(false);
     }, 500);
-  };
-
-  // const observer = new IntersectionObserver((entries, _observer) => {
-  //   if (entries[0].isIntersecting) {
-  //     callback();
-  //   }
-  // });
-
-  // useEffect(() => {
-  //   if (target.current) {
-  //     observer.observe(target.current);
-  //   }
-  //   return () => {
-  //     observer.disconnect();
-  //   };
-  // }, [page, cafeListArr]);
+  }, [loading, cafeList, cafeListArr, page]);
 
   useEffect(() => {
     if (!target.current) return;
@@ -132,7 +131,7 @@ const CafeList = ({
     return () => {
       observer.disconnect();
     };
-  }, [callback, cafeListArr]); // 또는 그냥 []로 한 번만 생성해도 됨
+  }, [callback]);
 
   useEffect(() => {
     //: cafeListArr가 바뀔 때마다 초기화
@@ -145,6 +144,10 @@ const CafeList = ({
     setCafeList(slicedCafeList);
     setPage(1); // 다시 1로 시작
   }, [cafeListArr]);
+
+  const openOperatingHours = () => {
+    setTest((prev: boolean) => !prev);
+  };
 
   //! 각 카페별 댓글 버튼을 누르면 그 카페에 대한 댓글 api 호출
 
@@ -186,46 +189,26 @@ const CafeList = ({
                 <CafeInfoDiv>
                   <p>{selectedCafe.description}</p>
                   <div>
-                    <span>
-                      영업시간 | {todayHours.open} ~ {todayHours.close}
+                    <span onClick={openOperatingHours}>
+                      영업시간 | {todayHours.open ?? '휴무'} ~{' '}
+                      {todayHours.close ?? '휴무'}
                       <img src={bottomArrow} alt="모든 영업시간 확인하기" />
                     </span>
-                    <ul>
-                      <li>
-                        월{' '}
-                        {`${selectedCafeHour?.opening_hours.tuesday.open ? selectedCafeHour?.opening_hours.tuesday.open : '정보 없음'} 
-                          ~ ${selectedCafeHour?.opening_hours.tuesday.close ? selectedCafeHour?.opening_hours.tuesday.open : '정보 없음'}`}
-                      </li>
-                      <li>
-                        화{' '}
-                        {`${selectedCafeHour?.opening_hours.wednesday.open ? selectedCafeHour?.opening_hours.wednesday.open : '정보 없음'} 
-                          ~ ${selectedCafeHour?.opening_hours.wednesday.close ? selectedCafeHour?.opening_hours.wednesday.open : '정보 없음'}`}
-                      </li>
-                      <li>
-                        수{' '}
-                        {`${selectedCafeHour?.opening_hours.thursday.open ? selectedCafeHour?.opening_hours.thursday.open : '정보 없음'} 
-                          ~ ${selectedCafeHour?.opening_hours.thursday.close ? selectedCafeHour?.opening_hours.thursday.open : '정보 없음'}`}
-                      </li>
-                      <li>
-                        목{' '}
-                        {`${selectedCafeHour?.opening_hours.friday.open ? selectedCafeHour?.opening_hours.friday.open : '정보 없음'} 
-                          ~ ${selectedCafeHour?.opening_hours.friday.close ? selectedCafeHour?.opening_hours.friday.open : '정보 없음'}`}
-                      </li>
-                      <li>
-                        금{' '}
-                        {`${selectedCafeHour?.opening_hours.saturday.open ? selectedCafeHour?.opening_hours.saturday.open : '정보 없음'} 
-                          ~ ${selectedCafeHour?.opening_hours.saturday.close ? selectedCafeHour?.opening_hours.saturday.open : '정보 없음'}`}
-                      </li>
-                      <li>
-                        토{' '}
-                        {`${selectedCafeHour?.opening_hours.monday.open ? selectedCafeHour?.opening_hours.monday.open : '정보 없음'} 
-                          ~ ${selectedCafeHour?.opening_hours.monday.close ? selectedCafeHour?.opening_hours.monday.open : '정보 없음'}`}
-                      </li>
-                      <li>
-                        일{' '}
-                        {`${selectedCafeHour?.opening_hours.sunday.open ? selectedCafeHour?.opening_hours.sunday.open : '정보 없음'} 
-                          ~ ${selectedCafeHour?.opening_hours.sunday.close ? selectedCafeHour?.opening_hours.sunday.open : '정보 없음'}`}
-                      </li>
+                    <ul
+                      className={`hours-list ${test && expandedId === selectedCafe.id ? 'open' : ''}`}
+                    >
+                      {weekDays.map(({ key, label }) => {
+                        const dayData =
+                          selectedCafeHour?.opening_hours[
+                            key as keyof openingHours['opening_hours']
+                          ];
+                        return (
+                          <li key={key}>
+                            {label} {dayData?.open ?? '휴무'} ~{' '}
+                            {dayData?.close ?? '휴무'}
+                          </li>
+                        );
+                      })}
                     </ul>
                   </div>
                   <img src={sampleCafe} alt="" />
@@ -278,46 +261,26 @@ const CafeList = ({
                   <CafeInfoDiv>
                     <p>{value.description}</p>
                     <div>
-                      <span>
-                        영업시간 | {todayHours.open} ~ {todayHours.close}
+                      <span onClick={openOperatingHours}>
+                        영업시간 | {todayHours.open ?? '휴무'} ~{' '}
+                        {todayHours.close ?? '휴무'}
                         <img src={bottomArrow} alt="모든 영업시간 확인하기" />
                       </span>
-                      <ul>
-                        <li>
-                          월{' '}
-                          {`${selectedCafeHour?.opening_hours.tuesday.open ? selectedCafeHour?.opening_hours.tuesday.open : '정보 없음'} 
-                          ~ ${selectedCafeHour?.opening_hours.tuesday.close ? selectedCafeHour?.opening_hours.tuesday.open : '정보 없음'}`}
-                        </li>
-                        <li>
-                          화{' '}
-                          {`${selectedCafeHour?.opening_hours.wednesday.open ? selectedCafeHour?.opening_hours.wednesday.open : '정보 없음'} 
-                          ~ ${selectedCafeHour?.opening_hours.wednesday.close ? selectedCafeHour?.opening_hours.wednesday.open : '정보 없음'}`}
-                        </li>
-                        <li>
-                          수{' '}
-                          {`${selectedCafeHour?.opening_hours.thursday.open ? selectedCafeHour?.opening_hours.thursday.open : '정보 없음'} 
-                          ~ ${selectedCafeHour?.opening_hours.thursday.close ? selectedCafeHour?.opening_hours.thursday.open : '정보 없음'}`}
-                        </li>
-                        <li>
-                          목{' '}
-                          {`${selectedCafeHour?.opening_hours.friday.open ? selectedCafeHour?.opening_hours.friday.open : '정보 없음'} 
-                          ~ ${selectedCafeHour?.opening_hours.friday.close ? selectedCafeHour?.opening_hours.friday.open : '정보 없음'}`}
-                        </li>
-                        <li>
-                          금{' '}
-                          {`${selectedCafeHour?.opening_hours.saturday.open ? selectedCafeHour?.opening_hours.saturday.open : '정보 없음'} 
-                          ~ ${selectedCafeHour?.opening_hours.saturday.close ? selectedCafeHour?.opening_hours.saturday.open : '정보 없음'}`}
-                        </li>
-                        <li>
-                          토{' '}
-                          {`${selectedCafeHour?.opening_hours.monday.open ? selectedCafeHour?.opening_hours.monday.open : '정보 없음'} 
-                          ~ ${selectedCafeHour?.opening_hours.monday.close ? selectedCafeHour?.opening_hours.monday.open : '정보 없음'}`}
-                        </li>
-                        <li>
-                          일{' '}
-                          {`${selectedCafeHour?.opening_hours.sunday.open ? selectedCafeHour?.opening_hours.sunday.open : '정보 없음'} 
-                          ~ ${selectedCafeHour?.opening_hours.sunday.close ? selectedCafeHour?.opening_hours.sunday.open : '정보 없음'}`}
-                        </li>
+                      <ul
+                        className={`hours-list ${test && expandedId === value.id ? 'open' : ''}`}
+                      >
+                        {weekDays.map(({ key, label }) => {
+                          const dayData =
+                            selectedCafeHour?.opening_hours[
+                              key as keyof openingHours['opening_hours']
+                            ];
+                          return (
+                            <li key={key}>
+                              {label} {dayData?.open ?? '휴무'} ~{' '}
+                              {dayData?.close ?? '휴무'}
+                            </li>
+                          );
+                        })}
                       </ul>
                     </div>
                     <img src={sampleCafe} alt="" />
@@ -354,7 +317,7 @@ const SelectedCafeWrapper = styled.div`
 `;
 
 const SelectedCafeDiv = styled.div`
-  border: 1px solid #9e076c;
+  border: 1px solid #9e9e9e;
   border-radius: 10px;
   overflow: hidden;
   max-height: 54px;
@@ -426,9 +389,20 @@ const CafeInfoDiv = styled.div`
     }
     ul {
       margin-top: 5px;
+      overflow: hidden;
+      transition: height 0.3s ease;
       li {
         margin-bottom: 1px;
       }
+    }
+    ul.hours-list {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-in-out;
+    }
+
+    ul.hours-list.open {
+      max-height: 200px; // 충분히 큰 값으로 설정 (초과해도 자동 스크롤됨)
     }
   }
   img {
