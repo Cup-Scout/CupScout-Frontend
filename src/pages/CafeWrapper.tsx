@@ -39,6 +39,11 @@ interface openingHours {
   };
 }
 
+interface todayHours {
+  open: string;
+  close: string;
+}
+
 const CafeWrapper = () => {
   const [cafeListArr, setCafeListArr] = useState<cafeInfo[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<Set<number>>(
@@ -51,6 +56,12 @@ const CafeWrapper = () => {
   const [selectedCafeHour, setSelectedCafeHour] = useState<openingHours | null>(
     null,
   );
+  const [test, setTest] = useState<boolean>(false);
+
+  const [todayHours, setTodayHours] = useState<todayHours>({
+    open: '',
+    close: '',
+  });
 
   const openStatus = async (id: number) => {
     const today = new Date();
@@ -158,15 +169,30 @@ const CafeWrapper = () => {
 
   const toggleExpand = async (id: number) => {
     if (expandedId === id) {
-      setExpandedId(null); // 클릭한 항목이 이미 열려 있으면 닫기
+      setExpandedId(null); //* 클릭한 항목이 이미 열려 있으면 닫기
+      setTest(false);
     } else {
-      setExpandedId(null); // 기존에 열려 있던 항목을 즉시 닫기
+      setExpandedId(null); //* 기존에 열려 있던 항목을 즉시 닫기
+      setTest(false);
       setExpandedId(id);
       const response = await fetch(
         `${import.meta.env.VITE_APP_LOCAL_API_URL}/api/cafes/${id}/hours`,
       );
       const data = await response.json();
-      console.log(data);
+      const today = new Date().getDay();
+      const dayOfWeek = [
+        'sunday',
+        'monday',
+        'tuesday',
+        'wednesday',
+        'thursday',
+        'friday',
+        'saturday',
+      ][today];
+
+      const todayOpen = data.opening_hours[dayOfWeek].open;
+      const todayClose = data.opening_hours[dayOfWeek].close;
+      setTodayHours({ open: todayOpen, close: todayClose });
       setSelectedCafeHour(data);
     }
   };
@@ -239,6 +265,9 @@ const CafeWrapper = () => {
         toggleExpand={toggleExpand}
         selectedCafeHour={selectedCafeHour}
         expandedId={expandedId}
+        todayHours={todayHours}
+        test={test}
+        setTest={setTest}
       />
     </Main>
   );
