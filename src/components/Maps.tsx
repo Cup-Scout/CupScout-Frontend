@@ -28,6 +28,7 @@ const Maps = ({
   setSelectedCafe,
   selectedCafe,
   toggleExpand,
+  setSwitchContent,
 }: any) => {
   const mapRef = useRef<HTMLDivElement | null>(null);
   const [clickMarkerInfo, setClickMarkerInfo] = useState<markerInfo | null>(
@@ -126,6 +127,7 @@ const Maps = ({
                 setClickMarkerInfo({ id, cafeName, addressDoro });
                 openSelectedCafeInfo(id);
                 toggleExpand(id);
+                setSwitchContent(false);
               };
             };
 

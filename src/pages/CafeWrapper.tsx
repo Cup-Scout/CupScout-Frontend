@@ -57,6 +57,7 @@ const CafeWrapper = () => {
     null,
   );
   const [test, setTest] = useState<boolean>(false);
+  const [switchContent, setSwitchContent] = useState(false);
 
   const [todayHours, setTodayHours] = useState<todayHours>({
     open: null,
@@ -171,6 +172,7 @@ const CafeWrapper = () => {
     if (expandedId === id) {
       setExpandedId(null); //* 클릭한 항목이 이미 열려 있으면 닫기
       setTest(false);
+      setSwitchContent(false);
     } else {
       setExpandedId(null); //* 기존에 열려 있던 항목을 즉시 닫기
       setTest(false);
@@ -194,6 +196,7 @@ const CafeWrapper = () => {
       const todayClose = data.opening_hours[dayOfWeek].close;
       setTodayHours({ open: todayOpen, close: todayClose });
       setSelectedCafeHour(data);
+      setSwitchContent(false);
     }
   };
 
@@ -258,6 +261,7 @@ const CafeWrapper = () => {
         setSelectedCafe={setSelectedCafe}
         selectedCafe={selectedCafe}
         toggleExpand={toggleExpand}
+        setSwitchContent={setSwitchContent}
       />
       <CafeList
         cafeListArr={cafeListArr}
@@ -268,6 +272,8 @@ const CafeWrapper = () => {
         todayHours={todayHours}
         test={test}
         setTest={setTest}
+        setSwitchContent={setSwitchContent}
+        switchContent={switchContent}
       />
     </Main>
   );
