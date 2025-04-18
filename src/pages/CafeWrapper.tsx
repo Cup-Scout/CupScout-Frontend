@@ -40,8 +40,8 @@ interface openingHours {
 }
 
 interface todayHours {
-  open: string;
-  close: string;
+  open: string | null;
+  close: string | null;
 }
 
 const CafeWrapper = () => {
@@ -59,8 +59,8 @@ const CafeWrapper = () => {
   const [test, setTest] = useState<boolean>(false);
 
   const [todayHours, setTodayHours] = useState<todayHours>({
-    open: '',
-    close: '',
+    open: null,
+    close: null,
   });
 
   const openStatus = async (id: number) => {

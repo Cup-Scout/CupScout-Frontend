@@ -42,7 +42,7 @@ interface cafeListArrProps {
   toggleExpand: (id: number) => void;
   selectedCafeHour: openingHours | null;
   expandedId: number | null;
-  todayHours: { open: string; close: string };
+  todayHours: { open: string | null; close: string | null };
   test: boolean;
   setTest: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -79,7 +79,6 @@ const CafeList = ({
 
   const target = useRef<HTMLDivElement | null>(null);
 
-
   const weekDays = [
     { key: 'monday', label: '월' },
     { key: 'tuesday', label: '화' },
@@ -89,7 +88,6 @@ const CafeList = ({
     { key: 'saturday', label: '토' },
     { key: 'sunday', label: '일' },
   ];
-
 
   const getComment = async (id: number | null) => {
     const response = await fetch(
@@ -106,7 +104,7 @@ const CafeList = ({
 
   const callback = useCallback(() => {
     if (loading) return;
-    if (cafeList.length >= cafeListArr.length) return; 
+    if (cafeList.length >= cafeListArr.length) return;
     setLoading(true);
     setTimeout(() => {
       const start = page * pageList;
@@ -151,6 +149,8 @@ const CafeList = ({
   };
 
   //! 각 카페별 댓글 버튼을 누르면 그 카페에 대한 댓글 api 호출
+
+  console.log(todayHours);
 
   return (
     <Section>
@@ -212,7 +212,6 @@ const CafeList = ({
                           </li>
                         );
                       })}
-
                     </ul>
                   </div>
                   <img src={sampleCafe} alt="" />
@@ -288,7 +287,6 @@ const CafeList = ({
                             </li>
                           );
                         })}
-
                       </ul>
                     </div>
                     <img src={sampleCafe} alt="" />
