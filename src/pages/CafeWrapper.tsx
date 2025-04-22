@@ -259,7 +259,6 @@ const CafeWrapper = () => {
       <Maps
         cafeListArr={cafeListArr}
         setSelectedCafe={setSelectedCafe}
-        selectedCafe={selectedCafe}
         toggleExpand={toggleExpand}
         setSwitchContent={setSwitchContent}
       />
