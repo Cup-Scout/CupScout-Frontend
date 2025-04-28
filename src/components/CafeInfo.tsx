@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import styled from 'styled-components';
 import bottomArrow from '../assets/bottom-arrow.png';
 import sampleCafe from '../assets/sampleCafe.png';
+import useDebounce from '../hooks/useDebounce';
 
 interface commentList {
   id: number;
@@ -53,8 +54,15 @@ const CafeInfo = ({
   setTest,
   selectedCafeHour,
 }: cafeInfoProps) => {
-  const [isVisible, setIsVisible] = useState<boolean>(false);
+  const [deletedId, setDeletedId] = useState<number | null>(null);
   const [commentList, setCommentList] = useState<commentList[]>([]);
+  const [createCommentValues, setCreateCommentValues] = useState({
+    nickname: '',
+    password: '',
+    content: '',
+  });
+  const passwordInputRefs = useRef<Record<number, HTMLInputElement | null>>({});
+
   const weekDays = [
     { key: 'monday', label: '월' },
     { key: 'tuesday', label: '화' },
@@ -73,8 +81,12 @@ const CafeInfo = ({
     setCommentList(data);
   };
 
-  const commentDeleteToggle = () => {
-    setIsVisible((prev) => !prev);
+  const commentDeleteToggle = (id: number) => {
+    if (deletedId === id) {
+      setDeletedId(null);
+    } else {
+      setDeletedId(id);
+    }
   };
 
   const toggleContent = async (id: number | null) => {
@@ -83,6 +95,92 @@ const CafeInfo = ({
   };
   const openOperatingHours = () => {
     setTest((prev: boolean) => !prev);
+  };
+
+  const deleteComment = async (id: number) => {
+    try {
+      const password = passwordInputRefs.current[id]?.value;
+      if (!password) {
+        alert('비밀번호를 입력해주세요.');
+        return;
+      }
+      const response = await fetch(
+        `${import.meta.env.VITE_APP_LOCAL_API_URL}/api/comments/${id}`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ password: password }),
+        },
+      );
+      const data = await response.json();
+      if (data.success) {
+        //: value.id = 카페 id
+        //: id = 댓글 id
+        await getComment(value.id);
+        alert(data.message);
+      } else {
+        throw new Error(data.message);
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        alert(error.message);
+        console.log(error.message);
+      } else {
+        console.log('알 수 없는 오류', error);
+      }
+    }
+  };
+
+  const onChangeComment = (value: string, keyName: string) => {
+    setCreateCommentValues({ ...createCommentValues, [keyName]: value });
+  };
+
+  const query = useDebounce(createCommentValues, 500);
+
+  const fetchComment = async () => {
+    if (query.nickname === '' || query.password === '' || query.content === '')
+      return;
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_APP_LOCAL_API_URL}/api/comments`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            cafeId: value.id,
+            nickname: query.nickname,
+            password: query.password,
+            content: query.content,
+          }),
+        },
+      );
+      const data = await response.json();
+      //: error가 발생했을 때 (success:false)
+      if (!response.ok) {
+        throw new Error(data.message);
+      }
+      //: fetch 성공했을 때 (success:true)
+      if (data.success) {
+        await getComment(value.id);
+        alert(data.message);
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        alert(error.message);
+        console.log(error.message);
+      } else {
+        console.log('알 수 없는 오류', error);
+      }
+    }
+    setCreateCommentValues({
+      nickname: '',
+      password: '',
+      content: '',
+    });
   };
 
   return (
@@ -98,22 +196,27 @@ const CafeInfo = ({
       </CafeTitleDiv>
       <>
         {switchContent ? (
-          <CafeCommentDiv visible={isVisible ? 1 : 0}>
+          <CafeCommentDiv>
             {commentList.length ? (
               <ul className="comment-list">
                 {commentList.map((v) => (
-                  <li key={v.id} onClick={() => commentDeleteToggle()}>
-                    <div>
+                  <li key={v.id}>
+                    <div onClick={() => commentDeleteToggle(v.id)}>
                       <p>{v.nickname}</p>
                       <p>{v.content}</p>
                       <p>{v.created.slice(0, 10)}</p>
                     </div>
-                    <div className="delete-comment-field">
+                    <div
+                      className={`${deletedId === v.id ? 'delete-comment-field' : 'delete-comment-field-hidden'}`}
+                    >
                       <input
                         type="password"
                         placeholder="비밀번호를 입력하면 삭제됩니다"
+                        ref={(el) => {
+                          passwordInputRefs.current[v.id] = el;
+                        }}
                       />
-                      <button>삭제</button>
+                      <button onClick={() => deleteComment(v.id)}>삭제</button>
                     </div>
                   </li>
                 ))}
@@ -137,20 +240,34 @@ const CafeInfo = ({
             <CreationComment>
               <div className="data-entry-field">
                 <div className="inputs">
-                  <input type="text" name="nickname" placeholder="닉네임" />
+                  <input
+                    type="text"
+                    name="nickname"
+                    placeholder="닉네임"
+                    value={createCommentValues.nickname}
+                    onChange={(e) =>
+                      onChangeComment(e.target.value, 'nickname')
+                    }
+                  />
                   <input
                     type="password"
                     name="password"
                     placeholder="비밀번호"
+                    value={createCommentValues.password}
+                    onChange={(e) =>
+                      onChangeComment(e.target.value, 'password')
+                    }
                   />
                 </div>
                 <textarea
                   placeholder="댓글을 입력하세요"
                   rows={3}
                   maxLength={45}
+                  value={createCommentValues.content}
+                  onChange={(e) => onChangeComment(e.target.value, 'content')}
                 />
               </div>
-              <button>등록</button>
+              <button onClick={fetchComment}>등록</button>
             </CreationComment>
             <ToggleButton onClick={() => toggleContent(null)}>
               카페 정보
@@ -294,7 +411,7 @@ const CreationComment = styled.section`
   }
 `;
 
-const CafeCommentDiv = styled.div<{ visible: number }>`
+const CafeCommentDiv = styled.div`
   padding: 0 26px 14px 26px;
   ul.comment-list {
     height: 180px;
@@ -312,7 +429,6 @@ const CafeCommentDiv = styled.div<{ visible: number }>`
         }
       }
       div:last-child {
-        display: ${({ visible }) => (visible ? 'block' : 'none')};
         align-items: stretch;
         justify-content: right;
         margin-bottom: 20px;
@@ -354,6 +470,9 @@ const CafeCommentDiv = styled.div<{ visible: number }>`
   }
   .delete-comment-field {
     display: flex;
+  }
+  .delete-comment-field-hidden {
+    display: none;
   }
 `;
 
