@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import markerIcon from '../assets/marker.svg';
 
 interface cafeInfo {
   id: number;
@@ -26,7 +25,6 @@ interface markerInfo {
 const Maps = ({
   cafeListArr,
   setSelectedCafe,
-  selectedCafe,
   toggleExpand,
   setSwitchContent,
 }: any) => {

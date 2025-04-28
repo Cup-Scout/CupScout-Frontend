@@ -116,7 +116,7 @@ const Article = styled.article`
   section {
     width: 100%;
     height: 100px;
-    background-image: url('../../public/sampleCafe.png');
+    background-image: url('/sampleCafe.png');
     background-color: transparent;
     background-repeat: no-repeat;
     background-size: cover;
