@@ -41,7 +41,7 @@ const Search = ({ setCafeListArr, getOperatingStatus }: any) => {
 
 const Section = styled.section`
   width: 100%;
-  height: 40px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -49,6 +49,7 @@ const Section = styled.section`
 `;
 
 const Input = styled.input`
+  font-size: 16px;
   height: 100%;
   margin-right: 6px;
   flex-grow: 1;

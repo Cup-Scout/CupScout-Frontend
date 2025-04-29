@@ -211,7 +211,7 @@ const CafeInfo = ({
                     >
                       <input
                         type="password"
-                        placeholder="비밀번호를 입력하면 삭제됩니다"
+                        placeholder="비밀번호를 입력하면 삭제됩니다."
                         ref={(el) => {
                           passwordInputRefs.current[v.id] = el;
                         }}
@@ -318,14 +318,14 @@ const CafeListLi = styled.li`
   max-height: 54px;
   transition: max-height 0.3s ease-in-out;
   margin: 10px 0;
-
+  list-style: none;
   &.expanded {
     max-height: 500px; /* 충분히 큰 값으로 설정 (콘텐츠에 따라 자동 조정) */
   }
 `;
 
 const CafeInfoDiv = styled.div`
-  padding: 0 26px 14px 26px;
+  padding: 0 14px 14px 14px;
   p,
   div {
     margin-bottom: 5px;
@@ -366,45 +366,49 @@ const CafeInfoDiv = styled.div`
 const CreationComment = styled.section`
   .data-entry-field {
     margin-top: 10px;
-    display: flex;
+    /* display: flex; */
     align-items: stretch; /* 중요: 두 열의 높이를 맞추기 위해 */
   }
   .inputs {
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
     height: 100%; /* stretch와 함께 사용하면 전체 높이 채움 */
-    margin-right: 5px;
+    gap: 8px;
+    transform: scale(0.75);
+    transform-origin: top left;
+    width: calc(100% / 0.75); /* 스케일 보정 */
+    margin-bottom: -4px;
   }
   input {
-    width: 60px;
-    font-size: 8px;
-    padding: 5px;
+    flex: 1;
+    font-size: 16px;
+    padding: 6.67px;
     box-sizing: border-box;
-    flex: 1; /* 동일한 높이로 나눔 */
-    border-radius: 4px;
+    border-radius: 5.33px;
     border: 1px solid #9e9e9e;
     text-align: center;
   }
   input:first-child {
-    margin-bottom: 5px;
   }
   textarea {
     resize: none;
-    width: 100%;
-    padding: 5px;
-    font-size: 10px;
+    width: calc(100% / 0.75);
+    padding: calc(5px / 0.75); /* 약 6.67px */
+    font-size: 16px; /* 줌 방지용 */
     overflow-y: hidden;
     border: 1px solid #9e9e9e;
-    border-radius: 4px;
+    border-radius: calc(4px / 0.75); /* 약 5.33px */
+    margin-bottom: -16px;
+
+    transform: scale(0.75);
+    transform-origin: top left;
   }
   button {
     margin: 0 auto;
-    width: 28px;
-    padding: 4px 0;
+    width: 40px;
+    padding: 6px 0;
     background-color: #384eda;
     border-radius: 12px;
-    font-size: 8px;
+    font-size: 10px;
     color: #fff;
     display: block;
     margin: 8px auto;
@@ -412,7 +416,7 @@ const CreationComment = styled.section`
 `;
 
 const CafeCommentDiv = styled.div`
-  padding: 0 26px 14px 26px;
+  padding: 0 14px 14px 14px;
   ul.comment-list {
     height: 180px;
     li {
@@ -435,20 +439,20 @@ const CafeCommentDiv = styled.div`
         transition: all 0.3s;
 
         input {
-          height: 14px;
-          font-size: 8px;
-          padding-left: 6px;
-          width: 120px;
+          height: 20px;
+          font-size: 11px;
+          padding-left: 10px;
+          width: 200px;
           border-radius: 12px;
           border: 1px solid #9e9e9e;
           color: #9e9e9e;
         }
         button {
-          width: 28px;
-          line-height: 14px;
+          width: 30px;
+          line-height: 16px;
           background-color: #384eda;
           border-radius: 12px;
-          font-size: 8px;
+          font-size: 10px;
           color: #fff;
           margin-left: 4px;
         }
@@ -462,7 +466,7 @@ const CafeCommentDiv = styled.div`
   p:last-child {
     margin-left: 5px;
     width: 50px;
-    font-size: 8px;
+    font-size: 9px;
     color: #9e9e9e;
   }
   div {
@@ -515,7 +519,7 @@ const Pagination = styled.section`
     li {
       margin-right: 6px;
       button {
-        font-size: 8px;
+        font-size: 10px;
         color: #9e9e9e;
         &:active {
           color: #9e076c;
