@@ -5,6 +5,7 @@ interface cafeInfo {
   id: number;
   name: string;
   address_doro: string;
+  address_jibun: string;
   lat: number | null;
   lng: number | null;
   description: string | null;
@@ -20,6 +21,7 @@ interface markerInfo {
   id: number;
   addressDoro: string;
   cafeName: string;
+  addressJibun: string;
 }
 
 const Maps = ({
@@ -78,6 +80,7 @@ const Maps = ({
             const latitude = newCafe[i].lat;
             const longitude = newCafe[i].lng;
             const addressDoro = newCafe[i].address_doro;
+            const addressJibun = newCafe[i].address_jibun;
             const id = newCafe[i].id;
             const cafeName = newCafe[i].name;
             const location = new naver.maps.LatLng(latitude, longitude);
@@ -122,7 +125,7 @@ const Maps = ({
             // 해당 마커의 인덱스를 seq라는 클로저 변수로 저장하는 이벤트 핸들러를 반환
             const getClickHandler = () => {
               return function () {
-                setClickMarkerInfo({ id, cafeName, addressDoro });
+                setClickMarkerInfo({ id, cafeName, addressDoro, addressJibun });
                 openSelectedCafeInfo(id);
                 toggleExpand(id);
                 setSwitchContent(false);
@@ -221,6 +224,11 @@ const Maps = ({
             <span>도로명</span>
             {clickMarkerInfo.addressDoro}
           </p>
+          <p>
+            <span>지번</span>
+            {clickMarkerInfo.addressJibun}
+          </p>
+          <button onClick={() => setClickMarkerInfo(null)}>x</button>
         </AddressWrapper>
       )}
     </Section>
@@ -242,11 +250,15 @@ const AddressWrapper = styled.div`
   padding: 8px;
   border: 1px solid #9e9e9e;
   border-radius: 12px;
-  p:first-child {
+  p:nth-of-type(1) {
     font-size: 12px;
     margin-bottom: 4px;
   }
-  p:last-child {
+  p:nth-of-type(2) {
+    margin-bottom: 4px;
+  }
+  p:nth-of-type(3),
+  p:nth-of-type(2) {
     font-size: 10px;
     span {
       display: inline-block;
@@ -256,6 +268,13 @@ const AddressWrapper = styled.div`
       border-radius: 12px;
       margin-right: 4px;
     }
+  }
+  button {
+    font-size: 10px;
+    color: #9e9e9e;
+    position: absolute;
+    top: 6px;
+    right: 10px;
   }
 `;
 
