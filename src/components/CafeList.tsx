@@ -46,6 +46,8 @@ interface cafeListArrProps {
   setTest: React.Dispatch<React.SetStateAction<boolean>>;
   switchContent: boolean;
   setSwitchContent: React.Dispatch<React.SetStateAction<boolean>>;
+  selectedExpandedId: number | null;
+  selectedToggleExpand: (id: number) => void;
 }
 
 const CafeList = ({
@@ -59,6 +61,8 @@ const CafeList = ({
   setTest,
   switchContent,
   setSwitchContent,
+  selectedExpandedId,
+  selectedToggleExpand,
 }: cafeListArrProps) => {
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState<number>(0);
@@ -119,8 +123,8 @@ const CafeList = ({
         <SelectedCafeWrapper>
           <CafeInfo
             value={selectedCafe}
-            expandedId={expandedId}
-            toggleExpand={toggleExpand}
+            selectedExpandedId={selectedExpandedId}
+            selectedToggleExpand={selectedToggleExpand}
             switchContent={switchContent}
             todayHours={todayHours}
             test={test}

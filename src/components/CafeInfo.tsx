@@ -33,14 +33,17 @@ interface openingHours {
 
 interface cafeInfoProps {
   value: any;
-  expandedId: number | null;
-  toggleExpand: (id: number) => void;
+  expandedId?: number | null;
+  toggleExpand?: (id: number) => void;
   switchContent: boolean;
   setSwitchContent: React.Dispatch<React.SetStateAction<boolean>>;
   todayHours: { open: string | null; close: string | null };
   test: boolean;
   setTest: React.Dispatch<React.SetStateAction<boolean>>;
   selectedCafeHour: openingHours | null;
+
+  selectedExpandedId?: number | null;
+  selectedToggleExpand?: (id: number) => void;
 }
 
 const CafeInfo = ({
@@ -53,6 +56,8 @@ const CafeInfo = ({
   test,
   setTest,
   selectedCafeHour,
+  selectedExpandedId,
+  selectedToggleExpand,
 }: cafeInfoProps) => {
   const [deletedId, setDeletedId] = useState<number | null>(null);
   const [commentList, setCommentList] = useState<commentList[]>([]);
@@ -72,6 +77,14 @@ const CafeInfo = ({
     { key: 'saturday', label: '토' },
     { key: 'sunday', label: '일' },
   ];
+
+  const isExpanded = expandedId === value.id;
+  const isSelectedExpanded = selectedExpandedId === value.id;
+
+  const handleClick = () => {
+    if (toggleExpand) toggleExpand(value.id);
+    if (selectedToggleExpand) selectedToggleExpand(value.id);
+  };
 
   const getComment = async (id: number | null) => {
     const response = await fetch(
@@ -184,13 +197,23 @@ const CafeInfo = ({
   };
 
   return (
-    <CafeListLi className={expandedId === value.id ? 'expanded' : ''}>
+    <CafeListLi
+      className={
+        expandedId !== undefined
+          ? isExpanded
+            ? 'expanded'
+            : ''
+          : isSelectedExpanded
+            ? 'expanded'
+            : ''
+      }
+    >
       <CafeTitleDiv operation={value.operation}>
         <div>
           <span></span>
           {value.name}
         </div>
-        <button onClick={() => toggleExpand(value.id)}>
+        <button onClick={() => handleClick()}>
           <img src={bottomArrow} alt="bottom arrow" />
         </button>
       </CafeTitleDiv>
