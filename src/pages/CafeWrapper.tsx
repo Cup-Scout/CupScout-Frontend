@@ -64,6 +64,10 @@ const CafeWrapper = () => {
     close: null,
   });
 
+  const [selectedExpandedId, setSelectedExpandedId] = useState<number | null>(
+    null,
+  );
+
   const openStatus = async (id: number) => {
     const today = new Date();
     const day = today.getDay();
@@ -169,6 +173,7 @@ const CafeWrapper = () => {
   };
 
   const toggleExpand = async (id: number) => {
+    // setSelectedExpandedId(null);
     if (expandedId === id) {
       setExpandedId(null); //* 클릭한 항목이 이미 열려 있으면 닫기
       setTest(false);
@@ -177,6 +182,39 @@ const CafeWrapper = () => {
       setExpandedId(null); //* 기존에 열려 있던 항목을 즉시 닫기
       setTest(false);
       setExpandedId(id);
+      const response = await fetch(
+        `${import.meta.env.VITE_APP_LOCAL_API_URL}/api/cafes/${id}/hours`,
+      );
+      const data = await response.json();
+      const today = new Date().getDay();
+      const dayOfWeek = [
+        'sunday',
+        'monday',
+        'tuesday',
+        'wednesday',
+        'thursday',
+        'friday',
+        'saturday',
+      ][today];
+
+      const todayOpen = data.opening_hours[dayOfWeek].open;
+      const todayClose = data.opening_hours[dayOfWeek].close;
+      setTodayHours({ open: todayOpen, close: todayClose });
+      setSelectedCafeHour(data);
+      setSwitchContent(false);
+    }
+  };
+
+  const selectedToggleExpand = async (id: number) => {
+    // setExpandedId(null);
+    if (selectedExpandedId === id) {
+      setSelectedExpandedId(null); //* 클릭한 항목이 이미 열려 있으면 닫기
+      setTest(false);
+      setSwitchContent(false);
+    } else {
+      setSelectedExpandedId(null); //* 기존에 열려 있던 항목을 즉시 닫기
+      setTest(false);
+      setSelectedExpandedId(id);
       const response = await fetch(
         `${import.meta.env.VITE_APP_LOCAL_API_URL}/api/cafes/${id}/hours`,
       );
@@ -259,7 +297,7 @@ const CafeWrapper = () => {
       <Maps
         cafeListArr={cafeListArr}
         setSelectedCafe={setSelectedCafe}
-        toggleExpand={toggleExpand}
+        selectedToggleExpand={selectedToggleExpand}
         setSwitchContent={setSwitchContent}
       />
       <CafeList
@@ -273,6 +311,8 @@ const CafeWrapper = () => {
         setTest={setTest}
         setSwitchContent={setSwitchContent}
         switchContent={switchContent}
+        selectedExpandedId={selectedExpandedId}
+        selectedToggleExpand={selectedToggleExpand}
       />
     </Main>
   );

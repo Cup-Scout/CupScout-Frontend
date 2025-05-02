@@ -27,7 +27,7 @@ interface markerInfo {
 const Maps = ({
   cafeListArr,
   setSelectedCafe,
-  toggleExpand,
+  selectedToggleExpand,
   setSwitchContent,
 }: any) => {
   const mapRef = useRef<HTMLDivElement | null>(null);
@@ -127,7 +127,7 @@ const Maps = ({
               return function () {
                 setClickMarkerInfo({ id, cafeName, addressDoro, addressJibun });
                 openSelectedCafeInfo(id);
-                toggleExpand(id);
+                selectedToggleExpand(id);
                 setSwitchContent(false);
               };
             };
