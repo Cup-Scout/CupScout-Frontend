@@ -4,7 +4,7 @@ import bottomArrow from '../assets/bottom-arrow.png';
 import sampleCafe from '../assets/sampleCafe.png';
 import useDebounce from '../hooks/useDebounce';
 
-interface commentList {
+interface commentData {
   id: number;
   nickname: string;
   password: string;
@@ -60,12 +60,14 @@ const CafeInfo = ({
   selectedToggleExpand,
 }: cafeInfoProps) => {
   const [deletedId, setDeletedId] = useState<number | null>(null);
-  const [commentList, setCommentList] = useState<commentList[]>([]);
+  const [commentList, setCommentList] = useState<commentData[]>([]);
   const [createCommentValues, setCreateCommentValues] = useState({
     nickname: '',
     password: '',
     content: '',
   });
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPageCount, setTotalPageCount] = useState<number[] | null>(null);
   const passwordInputRefs = useRef<Record<number, HTMLInputElement | null>>({});
 
   const weekDays = [
@@ -86,12 +88,19 @@ const CafeInfo = ({
     if (selectedToggleExpand) selectedToggleExpand(value.id);
   };
 
-  const getComment = async (id: number | null) => {
-    const response = await fetch(
-      `${import.meta.env.VITE_APP_LOCAL_API_URL}/api/comments/${id}`,
-    );
-    const data = await response.json();
-    setCommentList(data);
+  const getComment = async (id: number | null, currentPage: number = 1) => {
+    try {
+      setCurrentPage(currentPage);
+      const response = await fetch(
+        `${import.meta.env.VITE_APP_LOCAL_API_URL}/api/comments/${id}?page=${currentPage}&pageSize=${5}`,
+      );
+      const { comments, totalPages } = await response.json();
+      const pageCount = Array.from({ length: totalPages }, (_, i) => i + 1);
+      setTotalPageCount(pageCount);
+      setCommentList(comments);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const commentDeleteToggle = (id: number) => {
@@ -104,7 +113,7 @@ const CafeInfo = ({
 
   const toggleContent = async (id: number | null) => {
     setSwitchContent((prev: boolean) => !prev);
-    if (id) getComment(id);
+    if (id) getComment(id, currentPage);
   };
   const openOperatingHours = () => {
     setTest((prev: boolean) => !prev);
@@ -131,7 +140,7 @@ const CafeInfo = ({
       if (data.success) {
         //: value.id = 카페 id
         //: id = 댓글 id
-        await getComment(value.id);
+        await getComment(value.id, currentPage);
         alert(data.message);
       } else {
         throw new Error(data.message);
@@ -178,7 +187,7 @@ const CafeInfo = ({
       }
       //: fetch 성공했을 때 (success:true)
       if (data.success) {
-        await getComment(value.id);
+        await getComment(value.id, currentPage);
         alert(data.message);
       }
     } catch (error) {
@@ -249,15 +258,17 @@ const CafeInfo = ({
             )}
             <Pagination>
               <ul>
-                <li className="selected">
-                  <button>1</button>
-                </li>
-                <li>
-                  <button>2</button>
-                </li>
-                <li>
-                  <button>3</button>
-                </li>
+                {totalPageCount &&
+                  totalPageCount.map((v: number) => (
+                    <li
+                      className={`${currentPage === v ? 'selected' : ''}`}
+                      key={v}
+                    >
+                      <button onClick={() => getComment(value.id, v)}>
+                        {v}
+                      </button>
+                    </li>
+                  ))}
               </ul>
             </Pagination>
             <CreationComment>
