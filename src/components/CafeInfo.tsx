@@ -311,26 +311,35 @@ const CafeInfo = ({
           <CafeInfoDiv>
             <p>{value.description}</p>
             <div>
-              <span onClick={openOperatingHours}>
-                영업시간 | {todayHours.open ?? '휴무'} ~{' '}
-                {todayHours.close ?? '휴무'}
-                <img src={bottomArrow} alt="모든 영업시간 확인하기" />
-              </span>
+              {selectedCafeHour?.open_24h ? (
+                <span>영업시간 | 연중무휴</span>
+              ) : (
+                <span onClick={openOperatingHours}>
+                  영업시간 | {todayHours.open ?? '휴무'} ~{' '}
+                  {todayHours.close ?? '휴무'}
+                  <img src={bottomArrow} alt="모든 영업시간 확인하기" />
+                </span>
+              )}
+
               <ul
                 className={`hours-list ${test && expandedId === value.id ? 'open' : ''}`}
               >
-                {weekDays.map(({ key, label }) => {
-                  const dayData =
-                    selectedCafeHour?.opening_hours[
-                      key as keyof openingHours['opening_hours']
-                    ];
-                  return (
-                    <li key={key}>
-                      {label} {dayData?.open ?? '휴무'} ~{' '}
-                      {dayData?.close ?? '휴무'}
-                    </li>
-                  );
-                })}
+                {selectedCafeHour?.open_24h ? (
+                  <></>
+                ) : (
+                  weekDays.map(({ key, label }) => {
+                    const dayData =
+                      selectedCafeHour?.opening_hours[
+                        key as keyof openingHours['opening_hours']
+                      ];
+                    return (
+                      <li key={key}>
+                        {label} {dayData?.open ?? '휴무'} ~{' '}
+                        {dayData?.close ?? '휴무'}
+                      </li>
+                    );
+                  })
+                )}
               </ul>
             </div>
             <img src={sampleCafe} alt="" />

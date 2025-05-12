@@ -100,13 +100,13 @@ const CafeWrapper = () => {
     const finalCafeInfo = await Promise.all(
       data.map(async (value: any) => {
         const { operatingHour } = await openStatus(value.id);
-        if (!operatingHour) {
-          return {
-            ...value,
-            open_24h: null,
-            operation: null,
-          };
-        }
+        // if (!operatingHour) {
+        //   return {
+        //     ...value,
+        //     open_24h: null,
+        //     operation: null,
+        //   };
+        // }
 
         const today: Date = new Date();
         const year = today.getFullYear();
@@ -122,40 +122,115 @@ const CafeWrapper = () => {
           formatMonth = `${month + 1}`;
         }
 
-        if (day < 10) {
-          formatDay = `0${day}`;
+        //: 운영시간이 24시
+        if (operatingHour.open_24h) {
+          return {
+            ...value,
+            open_24h: operatingHour.open_24h,
+            operation: '영업중',
+          };
         } else {
-          formatDay = day;
+          //: 운영시간 24시 아님
+          if (operatingHour.open && operatingHour.close) {
+            //: 오늘 영업중인 곳
+            if (
+              Number(operatingHour.close.slice(0, 2)) <
+              Number(operatingHour.open.slice(0, 2))
+            ) {
+              //: 운영시간이 새벽까지 인 곳
+              if (day < 10) {
+                formatDay = `0${day}`;
+              } else {
+                formatDay = day;
+              }
+
+              let closeFormatDay;
+              if (day + 1 < 10) {
+                closeFormatDay = `0${day + 1}`;
+              } else {
+                closeFormatDay = day + 1;
+              }
+
+              const openTime = new Date(
+                `${year}-${formatMonth}-${formatDay}T${operatingHour.open}:00`,
+              );
+
+              const closeTime = new Date(
+                `${year}-${formatMonth}-${closeFormatDay}T${operatingHour.close}:00`,
+              );
+
+              let closeTimeNumber: number | string = closeTime.getHours();
+              if (closeTimeNumber < 10) {
+                closeTimeNumber = `0${closeTimeNumber - 1}`;
+              } else {
+                closeTimeNumber = closeTimeNumber - 1;
+              }
+              const almostCloseTime = new Date(
+                `${year}-${formatMonth}-${closeFormatDay}T${closeTimeNumber}:00`,
+              );
+              console.log(almostCloseTime);
+
+              let isOperating: string;
+
+              if (today >= openTime && today < almostCloseTime) {
+                isOperating = '영업중';
+              } else if (today >= almostCloseTime && today < closeTime) {
+                isOperating = '곧 영업종료';
+              } else {
+                isOperating = '영업종료';
+              }
+
+              return {
+                ...value,
+                open_24h: operatingHour.open_24h,
+                operation: isOperating,
+              };
+            } else {
+              //: 운영시간이 24시전 끝나는 곳
+              if (day < 10) {
+                formatDay = `0${day}`;
+              } else {
+                formatDay = day;
+              }
+
+              const openTime = new Date(
+                `${year}-${formatMonth}-${formatDay}T${operatingHour.open}:00`,
+              );
+
+              const closeTime = new Date(
+                `${year}-${formatMonth}-${formatDay}T${operatingHour.close}:00`,
+              );
+
+              const closeTimeNumber = closeTime.getHours();
+
+              const almostCloseTime = new Date(
+                `${year}-${formatMonth}-${formatDay}T${closeTimeNumber - 1}:00`,
+              );
+              let isOperating: string;
+
+              if (today >= openTime && today < almostCloseTime) {
+                isOperating = '영업중';
+              } else if (today >= almostCloseTime && today < closeTime) {
+                isOperating = '곧 영업종료';
+              } else {
+                isOperating = '영업종료';
+              }
+
+              return {
+                ...value,
+                open_24h: operatingHour.open_24h,
+                operation: isOperating,
+              };
+            }
+          } else {
+            //: 오늘 영업이 아닌 곳
+            return {
+              ...value,
+              open_24h: null,
+              operation: null,
+            };
+          }
         }
-
-        const openTime = new Date(
-          `${year}-${formatMonth}-${formatDay}T${operatingHour.open}:00`,
-        );
-
-        const closeTime = new Date(
-          `${year}-${formatMonth}-${formatDay}T${operatingHour.close}:00`,
-        );
-
-        const closeTimeNumber = closeTime.getHours();
-
-        const almostCloseTime = new Date(
-          `${year}-${formatMonth}-${formatDay}T${closeTimeNumber - 1}:00`,
-        );
-        let isOperating: string;
-
-        if (today >= openTime && today < almostCloseTime) {
-          isOperating = '영업중';
-        } else if (today >= almostCloseTime && today < closeTime) {
-          isOperating = '곧 영업종료';
-        } else {
-          isOperating = '영업종료';
-        }
-
-        return {
-          ...value,
-          open_24h: operatingHour.open_24h,
-          operation: isOperating,
-        };
       }),
     );
     return finalCafeInfo;
@@ -169,6 +244,7 @@ const CafeWrapper = () => {
     //* cafeList 변경됨
 
     const finalCafeInfo = await getOperatingStatus(data);
+    console.log(finalCafeInfo);
     setCafeListArr(finalCafeInfo);
   };
 
