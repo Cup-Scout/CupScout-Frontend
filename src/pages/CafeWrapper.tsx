@@ -168,7 +168,6 @@ const CafeWrapper = () => {
               const almostCloseTime = new Date(
                 `${year}-${formatMonth}-${closeFormatDay}T${closeTimeNumber}:00`,
               );
-              console.log(almostCloseTime);
 
               let isOperating: string;
 
@@ -244,7 +243,6 @@ const CafeWrapper = () => {
     //* cafeList 변경됨
 
     const finalCafeInfo = await getOperatingStatus(data);
-    console.log(finalCafeInfo);
     setCafeListArr(finalCafeInfo);
   };
 
