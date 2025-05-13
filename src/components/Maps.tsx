@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
+import close from '../assets/close.png';
 
 interface cafeInfo {
   id: number;
@@ -228,7 +229,14 @@ const Maps = ({
             <span>지번</span>
             {clickMarkerInfo.addressJibun}
           </p>
-          <button onClick={() => setClickMarkerInfo(null)}>x</button>
+          <button
+            onClick={() => {
+              setClickMarkerInfo(null);
+              setSelectedCafe(null);
+            }}
+          >
+            <img src={close} alt="마커 정보 닫기" />
+          </button>
         </AddressWrapper>
       )}
     </Section>
@@ -275,6 +283,9 @@ const AddressWrapper = styled.div`
     position: absolute;
     top: 6px;
     right: 10px;
+    img {
+      width: 6px;
+    }
   }
 `;
 

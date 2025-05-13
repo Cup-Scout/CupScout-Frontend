@@ -38,6 +38,7 @@ const Category = ({ selectedCategories, setSelectedCategories }: any) => {
   }, []);
 
   const selectCategory = (id: number) => {
+    //: 이전 카테고리
     const newSelected = new Set(selectedCategories);
     newSelected.has(id) ? newSelected.delete(id) : newSelected.add(id);
     setSelectedCategories(newSelected);

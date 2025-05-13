@@ -333,7 +333,7 @@ const CafeWrapper = () => {
   useEffect(() => {
     const state = location.state;
     if (state === 999) {
-      getAllCafeList();
+      // getAllCafeList();
     } else if (typeof state === 'number') {
       const newSet = new Set<number>();
       newSet.add(state);
@@ -351,7 +351,7 @@ const CafeWrapper = () => {
   useEffect(() => {
     //: 아무것도 선택 안했을 경우 무시
     if (selectedCategories.size === 0) {
-      getAllCafeList();
+      setCafeListArr([]);
       return;
     }
 
