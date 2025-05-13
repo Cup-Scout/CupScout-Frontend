@@ -2,14 +2,6 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
-interface categoryInfo {
-  category: string;
-  created: string;
-  description: string;
-  id: number;
-  updated: string;
-}
-
 const MainWrapper = () => {
   const navigate = useNavigate();
   const [categoryListArr, setCategoryListArr] = useState<categoryInfo[]>([]);
@@ -26,24 +18,45 @@ const MainWrapper = () => {
     getCategory();
   }, []);
 
+  const categoryIcon = {
+    STUDY: { icon: '📝' },
+    BOOK: { icon: '📚' },
+    BINGSOO: { icon: '🍧' },
+    MEMORY: { icon: '🎡' },
+    DESERT: { icon: '🍰' },
+    COFFEE: { icon: '☕️' },
+    VIEW: { icon: '🏞️' },
+    LARGE: { icon: '🌈' },
+  } as const;
+
+  type CategoryKey = keyof typeof categoryIcon;
+
+  interface categoryInfo {
+    category: CategoryKey;
+    created: string;
+    description: string;
+    id: number;
+    updated: string;
+  }
+
   return (
     <Main className="wrapper">
       <Nav>
         <ul>
-          <li onClick={() => navigate('/cafe', { state: 999 })}>
+          {/* <li onClick={() => navigate('/cafe', { state: 999 })}>
             <p>
               <span>☕️</span>모든 카페
             </p>
-          </li>
+          </li> */}
           {categoryListArr.map(
             (value, index) =>
-              index < 3 && (
+              index < 4 && (
                 <li
                   key={value.id}
                   onClick={() => navigate('/cafe', { state: value.id })}
                 >
                   <p>
-                    <span>☕️</span>
+                    <span>{categoryIcon[value.category].icon}</span>
                     {value.description}
                   </p>
                 </li>
