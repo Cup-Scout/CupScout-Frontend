@@ -173,7 +173,7 @@ const Section = styled.section`
 `;
 const SelectedCafeWrapper = styled.div`
   padding: 10px 0;
-  border-bottom: 1px solid #9e9e9e;
+  border-bottom: 1px solid #e6e6e6;
 `;
 
 export default CafeList;
