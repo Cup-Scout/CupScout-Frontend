@@ -130,7 +130,7 @@ const CafeWrapper = () => {
             operation: '영업중',
           };
         } else {
-          //: 운영시간 24시 아님
+          //: 운영시간 연중무휴 아님
           if (operatingHour.open && operatingHour.close) {
             //: 오늘 영업중인 곳
             if (
@@ -200,7 +200,11 @@ const CafeWrapper = () => {
                 `${year}-${formatMonth}-${formatDay}T${operatingHour.close}:00`,
               );
 
-              const closeTimeNumber = closeTime.getHours();
+              let closeTimeNumber = closeTime.getHours();
+
+              if (closeTimeNumber === 0) {
+                closeTimeNumber = 24;
+              }
 
               const almostCloseTime = new Date(
                 `${year}-${formatMonth}-${formatDay}T${closeTimeNumber - 1}:00`,
