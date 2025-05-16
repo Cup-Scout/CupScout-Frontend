@@ -102,12 +102,12 @@ const CategoryNav = styled.nav`
       cursor: pointer;
 
       &:active {
-        background-color: rgba(0, 0, 0, 0.5);
+        background-color: #004e12;
         color: #fff;
       }
 
       &.selected {
-        background-color: rgba(0, 0, 0, 0.5);
+        background-color: #004e12;
         color: #fff;
       }
     }

@@ -355,13 +355,17 @@ const CafeInfo = ({
 };
 
 const CafeListLi = styled.li`
-  border: 1px solid #9e9e9e;
+  /* border: 1px solid #9e9e9e; */
+  box-shadow: 0px 1px 5px -1px #b7b7b7;
+  box-sizing: border-box;
   border-radius: 10px;
   overflow: hidden;
-  max-height: 54px;
+  max-height: 53px;
   transition: max-height 0.3s ease-in-out;
   margin: 10px 0;
   list-style: none;
+  margin-left: 2px;
+  margin-right: 2px;
   &.expanded {
     max-height: 500px; /* 충분히 큰 값으로 설정 (콘텐츠에 따라 자동 조정) */
   }
