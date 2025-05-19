@@ -229,7 +229,7 @@ const CafeInfo = ({
       <>
         {switchContent ? (
           <CafeCommentDiv>
-            {commentList.length ? (
+            {commentList?.length ? (
               <ul className="comment-list">
                 {commentList.map((v) => (
                   <li key={v.id}>
