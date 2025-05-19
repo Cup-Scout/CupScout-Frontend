@@ -239,16 +239,16 @@ const CafeWrapper = () => {
     return finalCafeInfo;
   };
 
-  const getAllCafeList = async () => {
-    const response = await fetch(
-      `${import.meta.env.VITE_APP_LOCAL_API_URL}/api/cafes`,
-    );
-    const data = await response.json();
-    //* cafeList 변경됨
+  // const getAllCafeList = async () => {
+  //   const response = await fetch(
+  //     `${import.meta.env.VITE_APP_LOCAL_API_URL}/api/cafes`,
+  //   );
+  //   const data = await response.json();
+  //   //* cafeList 변경됨
 
-    const finalCafeInfo = await getOperatingStatus(data);
-    setCafeListArr(finalCafeInfo);
-  };
+  //   const finalCafeInfo = await getOperatingStatus(data);
+  //   setCafeListArr(finalCafeInfo);
+  // };
 
   const toggleExpand = async (id: number) => {
     // setSelectedExpandedId(null);
