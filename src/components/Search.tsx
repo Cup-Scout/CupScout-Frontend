@@ -4,9 +4,14 @@ import searchIcon from '../assets/search-icon.png';
 import mainLogo from '../assets/cup-scout.png';
 import { useNavigate } from 'react-router-dom';
 
-const Search = ({ setCafeListArr, getOperatingStatus }: any) => {
+import { useAtom } from 'jotai';
+import { getCafeListArr } from '../atoms';
+
+const Search = ({ getOperatingStatus }: any) => {
   // const inputRef = useRef<HTMLInputElement | null>(null);
   const [value, setValue] = useState('');
+
+  const [_, setCafeListArr] = useAtom(getCafeListArr);
 
   const navigate = useNavigate();
 

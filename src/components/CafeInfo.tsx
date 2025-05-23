@@ -4,6 +4,14 @@ import bottomArrow from '../assets/bottom-arrow.png';
 import sampleCafe from '../assets/sampleCafe.png';
 import useDebounce from '../hooks/useDebounce';
 
+import { useAtom } from 'jotai';
+import {
+  getSwitchContent,
+  getTodayHours,
+  getTest,
+  getSelectedCafeHour,
+} from '../atoms';
+
 interface commentData {
   id: number;
   nickname: string;
@@ -35,13 +43,6 @@ interface cafeInfoProps {
   value: any;
   expandedId?: number | null;
   toggleExpand?: (id: number) => void;
-  switchContent: boolean;
-  setSwitchContent: React.Dispatch<React.SetStateAction<boolean>>;
-  todayHours: { open: string | null; close: string | null };
-  test: boolean;
-  setTest: React.Dispatch<React.SetStateAction<boolean>>;
-  selectedCafeHour: openingHours | null;
-
   selectedExpandedId?: number | null;
   selectedToggleExpand?: (id: number) => void;
 }
@@ -50,12 +51,6 @@ const CafeInfo = ({
   value,
   expandedId,
   toggleExpand,
-  switchContent,
-  setSwitchContent,
-  todayHours,
-  test,
-  setTest,
-  selectedCafeHour,
   selectedExpandedId,
   selectedToggleExpand,
 }: cafeInfoProps) => {
@@ -69,6 +64,11 @@ const CafeInfo = ({
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPageCount, setTotalPageCount] = useState<number[] | null>(null);
   const passwordInputRefs = useRef<Record<number, HTMLInputElement | null>>({});
+
+  const [switchContent, setSwitchContent] = useAtom(getSwitchContent);
+  const [todayHours, _] = useAtom(getTodayHours);
+  const [test, setTest] = useAtom(getTest);
+  const [selectedCafeHour, __] = useAtom(getSelectedCafeHour);
 
   const weekDays = [
     { key: 'monday', label: '월' },

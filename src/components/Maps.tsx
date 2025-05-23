@@ -3,6 +3,9 @@ import styled from 'styled-components';
 import close from '../assets/close.png';
 import markerIcon from '../assets/marker.svg';
 
+import { useAtom } from 'jotai';
+import { getCafeListArr, getSelectedCafe, getSwitchContent } from '../atoms';
+
 interface cafeInfo {
   id: number;
   name: string;
@@ -26,16 +29,15 @@ interface markerInfo {
   addressJibun: string;
 }
 
-const Maps = ({
-  cafeListArr,
-  setSelectedCafe,
-  selectedToggleExpand,
-  setSwitchContent,
-}: any) => {
+const Maps = ({ selectedToggleExpand }: any) => {
   const mapRef = useRef<HTMLDivElement | null>(null);
   const [clickMarkerInfo, setClickMarkerInfo] = useState<markerInfo | null>(
     null,
   );
+
+  const [cafeListArr, _] = useAtom(getCafeListArr);
+  const [__, setSelectedCafe] = useAtom(getSelectedCafe);
+  const [___, setSwitchContent] = useAtom(getSwitchContent);
 
   const setMap = (naver: any, location: any) => {
     try {

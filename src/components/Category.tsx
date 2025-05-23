@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
+import { useAtom } from 'jotai';
+import { getSelectedCategories } from '../atoms';
+
 interface categoryInfo {
   category: string;
   created: string;
@@ -9,13 +12,13 @@ interface categoryInfo {
   updated: string;
 }
 
-const Category = ({ selectedCategories, setSelectedCategories }: any) => {
-  // const [categoryMenuListArr, setCategoryMenuListArr] = useState<
-  //   categoryInfo[]
-  // >([]);
-
+const Category = () => {
   const [line1, setLine1] = useState<categoryInfo[]>([]);
   const [line2, setLine2] = useState<categoryInfo[]>([]);
+
+  const [selectedCategories, setSelectedCategories] = useAtom(
+    getSelectedCategories,
+  );
 
   const getCategory = async () => {
     const response = await fetch(
