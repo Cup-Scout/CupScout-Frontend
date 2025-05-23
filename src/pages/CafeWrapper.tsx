@@ -1,72 +1,39 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
+import { useAtom } from 'jotai';
 
 import Maps from '../components/Maps';
 import Search from '../components/Search';
 import Category from '../components/Category';
 import CafeList from '../components/CafeList';
-import styled from 'styled-components';
 
-interface cafeInfo {
-  id: number;
-  name: string;
-  address_doro: string;
-  lat: number | null;
-  lng: number | null;
-  description: string | null;
-  categories: string | null;
-  visible: number;
-  deleted: number;
-  created: string;
-  updated: string;
-  open_24h: number | null;
-  operation: string;
-}
-
-interface openingHours {
-  event: null;
-  id: number;
-  name: string;
-  open_24h: number | null;
-  opening_hours: {
-    monday: { open: null | number; close: null | number };
-    tuesday: { open: null | number; close: null | number };
-    wednesday: { open: null | number; close: null | number };
-    thursday: { open: null | number; close: null | number };
-    friday: { open: null | number; close: null | number };
-    saturday: { open: null | number; close: null | number };
-    sunday: { open: null | number; close: null | number };
-  };
-}
-
-interface todayHours {
-  open: string | null;
-  close: string | null;
-}
+import {
+  getCafeListArr,
+  getSelectedCategories,
+  getExpandedId,
+  getSelectedCafeHour,
+  getTest,
+  getSwitchContent,
+  getTodayHours,
+  getSelectedExpandedId,
+} from '../atoms';
 
 const CafeWrapper = () => {
-  const [cafeListArr, setCafeListArr] = useState<cafeInfo[]>([]);
-  const [selectedCategories, setSelectedCategories] = useState<Set<number>>(
-    new Set(),
+  const [cafeListArr, setCafeListArr] = useAtom(getCafeListArr);
+  const [selectedCategories, setSelectedCategories] = useAtom(
+    getSelectedCategories,
   );
-  const [selectedCafe, setSelectedCafe] = useState<cafeInfo | null>(null);
+  const [expandedId, setExpandedId] = useAtom(getExpandedId);
+  const [_, setSelectedCafeHour] = useAtom(getSelectedCafeHour);
+  const [__, setTest] = useAtom(getTest);
+  const [___, setSwitchContent] = useAtom(getSwitchContent);
+  const [____, setTodayHours] = useAtom(getTodayHours);
+  const [selectedExpandedId, setSelectedExpandedId] = useAtom(
+    getSelectedExpandedId,
+  );
   const location = useLocation();
   const navigate = useNavigate();
-  const [expandedId, setExpandedId] = useState<number | null>(null);
-  const [selectedCafeHour, setSelectedCafeHour] = useState<openingHours | null>(
-    null,
-  );
-  const [test, setTest] = useState<boolean>(false);
-  const [switchContent, setSwitchContent] = useState(false);
-
-  const [todayHours, setTodayHours] = useState<todayHours>({
-    open: null,
-    close: null,
-  });
-
-  const [selectedExpandedId, setSelectedExpandedId] = useState<number | null>(
-    null,
-  );
 
   const openStatus = async (id: number) => {
     const today = new Date();
@@ -96,17 +63,10 @@ const CafeWrapper = () => {
     }
   };
 
-  const getOperatingStatus = async (data: any) => {
+  const getOperatingStatus = async (data: any[]) => {
     const finalCafeInfo = await Promise.all(
       data.map(async (value: any) => {
         const { operatingHour } = await openStatus(value.id);
-        // if (!operatingHour) {
-        //   return {
-        //     ...value,
-        //     open_24h: null,
-        //     operation: null,
-        //   };
-        // }
 
         const today: Date = new Date();
         const year = today.getFullYear();
@@ -239,19 +199,7 @@ const CafeWrapper = () => {
     return finalCafeInfo;
   };
 
-  // const getAllCafeList = async () => {
-  //   const response = await fetch(
-  //     `${import.meta.env.VITE_APP_LOCAL_API_URL}/api/cafes`,
-  //   );
-  //   const data = await response.json();
-  //   //* cafeList 변경됨
-
-  //   const finalCafeInfo = await getOperatingStatus(data);
-  //   setCafeListArr(finalCafeInfo);
-  // };
-
   const toggleExpand = async (id: number) => {
-    // setSelectedExpandedId(null);
     if (expandedId === id) {
       setExpandedId(null); //* 클릭한 항목이 이미 열려 있으면 닫기
       setTest(false);
@@ -285,6 +233,7 @@ const CafeWrapper = () => {
 
   const selectedToggleExpand = async (id: number) => {
     // setExpandedId(null);
+
     if (selectedExpandedId === id) {
       setSelectedExpandedId(null); //* 클릭한 항목이 이미 열려 있으면 닫기
       setTest(false);
@@ -336,9 +285,7 @@ const CafeWrapper = () => {
   //: 초기 진입 시 한 번만 실행
   useEffect(() => {
     const state = location.state;
-    if (state === 999) {
-      // getAllCafeList();
-    } else if (typeof state === 'number') {
+    if (typeof state === 'number') {
       const newSet = new Set<number>();
       newSet.add(state);
       //: Set 자료구조로 만들어진 category에 저장
@@ -364,31 +311,13 @@ const CafeWrapper = () => {
 
   return (
     <Main className="wrapper">
-      <Search
-        setCafeListArr={setCafeListArr}
-        getOperatingStatus={getOperatingStatus}
-      />
-      <Category
-        selectedCategories={selectedCategories}
-        setSelectedCategories={setSelectedCategories}
-      />
-      <Maps
-        cafeListArr={cafeListArr}
-        setSelectedCafe={setSelectedCafe}
-        selectedToggleExpand={selectedToggleExpand}
-        setSwitchContent={setSwitchContent}
-      />
+      <Search getOperatingStatus={getOperatingStatus} />
+      <Category />
+      <Maps selectedToggleExpand={selectedToggleExpand} />
       <CafeList
         cafeListArr={cafeListArr}
-        selectedCafe={selectedCafe}
-        toggleExpand={toggleExpand}
-        selectedCafeHour={selectedCafeHour}
         expandedId={expandedId}
-        todayHours={todayHours}
-        test={test}
-        setTest={setTest}
-        setSwitchContent={setSwitchContent}
-        switchContent={switchContent}
+        toggleExpand={toggleExpand}
         selectedExpandedId={selectedExpandedId}
         selectedToggleExpand={selectedToggleExpand}
       />

@@ -3,6 +3,9 @@ import styled from 'styled-components';
 import LoadingState from './LoadingState';
 import CafeInfo from './CafeInfo';
 
+import { useAtom } from 'jotai';
+import { getSelectedCafe } from '../atoms';
+
 interface cafeInfo {
   id: number;
   name: string;
@@ -19,54 +22,25 @@ interface cafeInfo {
   operation: string;
 }
 
-interface openingHours {
-  event: null;
-  id: number;
-  name: string;
-  open_24h: number | null;
-  opening_hours: {
-    monday: { open: null | number; close: null | number };
-    tuesday: { open: null | number; close: null | number };
-    wednesday: { open: null | number; close: null | number };
-    thursday: { open: null | number; close: null | number };
-    friday: { open: null | number; close: null | number };
-    saturday: { open: null | number; close: null | number };
-    sunday: { open: null | number; close: null | number };
-  };
-}
-
 interface cafeListArrProps {
   cafeListArr: cafeInfo[];
-  selectedCafe: cafeInfo | null;
-  toggleExpand: (id: number) => void;
-  selectedCafeHour: openingHours | null;
   expandedId: number | null;
-  todayHours: { open: string | null; close: string | null };
-  test: boolean;
-  setTest: React.Dispatch<React.SetStateAction<boolean>>;
-  switchContent: boolean;
-  setSwitchContent: React.Dispatch<React.SetStateAction<boolean>>;
+  toggleExpand: (id: number) => void;
   selectedExpandedId: number | null;
   selectedToggleExpand: (id: number) => void;
 }
 
 const CafeList = ({
   cafeListArr,
-  selectedCafe,
-  toggleExpand,
-  selectedCafeHour,
   expandedId,
-  todayHours,
-  test,
-  setTest,
-  switchContent,
-  setSwitchContent,
+  toggleExpand,
   selectedExpandedId,
   selectedToggleExpand,
 }: cafeListArrProps) => {
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState<number>(0);
   const [cafeList, setCafeList] = useState<cafeInfo[]>([]);
+  const [selectedCafe, _] = useAtom(getSelectedCafe);
 
   const pageList = 6;
 
@@ -125,12 +99,6 @@ const CafeList = ({
             value={selectedCafe}
             selectedExpandedId={selectedExpandedId}
             selectedToggleExpand={selectedToggleExpand}
-            switchContent={switchContent}
-            todayHours={todayHours}
-            test={test}
-            setTest={setTest}
-            setSwitchContent={setSwitchContent}
-            selectedCafeHour={selectedCafeHour}
           />
         </SelectedCafeWrapper>
       )}
@@ -143,12 +111,6 @@ const CafeList = ({
               value={value}
               expandedId={expandedId}
               toggleExpand={toggleExpand}
-              switchContent={switchContent}
-              todayHours={todayHours}
-              test={test}
-              setTest={setTest}
-              setSwitchContent={setSwitchContent}
-              selectedCafeHour={selectedCafeHour}
             />
           ))}
         {cafeList.length < cafeListArr.length && (
